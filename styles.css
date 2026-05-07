@@ -41,9 +41,9 @@ body {
 
 .qr-layer {
   position: absolute;
-  left: 12.95%;
-  top: 60.75%;
-  width: 7.35%;
+  left: 12.1%;
+  top: 60.25%;
+  width: 8.3%;
   aspect-ratio: 1;
   display: block;
   z-index: 2;
