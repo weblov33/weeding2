@@ -1,7 +1,6 @@
 :root {
   --paper-bg: #f5f1f5;
   --focus: #c87538;
-  --dot: #63734c;
 }
 
 * {
@@ -27,7 +26,7 @@ body {
 .poster-story {
   --step-count: 12;
   position: relative;
-  min-height: calc(var(--step-count) * 100svh);
+  min-height: calc(var(--step-count) * 100dvh);
   background: var(--paper-bg);
 }
 
@@ -36,17 +35,40 @@ body {
   top: 0;
   width: 100%;
   height: 100vh;
-  height: 100svh;
+  height: 100dvh;
   overflow: hidden;
   background: var(--paper-bg);
   contain: layout paint;
   touch-action: pan-y;
 }
 
+.story-camera::before {
+  content: "";
+  position: absolute;
+  inset: -26px;
+  z-index: 0;
+  background: url("assets/invitation.png") center / cover no-repeat;
+  filter: blur(16px) saturate(0.92);
+  opacity: 0.32;
+  transform: scale(1.05);
+}
+
+.story-camera::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(245, 241, 245, 0.25), transparent 18%, transparent 82%, rgba(245, 241, 245, 0.28)),
+    linear-gradient(90deg, rgba(245, 241, 245, 0.2), transparent 16%, transparent 84%, rgba(245, 241, 245, 0.2));
+}
+
 .poster-map {
   position: absolute;
   left: 0;
   top: 0;
+  z-index: 2;
   width: 1080px;
   height: 1920px;
   transform-origin: 0 0;
@@ -101,34 +123,42 @@ body {
   outline-offset: 6px;
 }
 
-.progress-dots {
-  position: fixed;
+.scroll-hint {
+  position: absolute;
   left: 50%;
-  bottom: max(12px, env(safe-area-inset-bottom));
+  bottom: max(18px, env(safe-area-inset-bottom));
   z-index: 20;
   display: flex;
-  gap: 7px;
-  max-width: calc(100vw - 28px);
-  padding: 8px 10px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px 10px;
   border-radius: 999px;
   background: rgba(245, 241, 245, 0.72);
+  color: #63734c;
+  font: 700 15px/1 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   backdrop-filter: blur(10px);
+  box-shadow: 0 10px 28px rgba(80, 65, 80, 0.08);
   transform: translateX(-50%);
+  transition: opacity 280ms ease, transform 280ms ease;
 }
 
-.progress-dots button {
-  width: 7px;
-  height: 7px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(99, 115, 76, 0.28);
-  cursor: pointer;
+.scroll-hint span {
+  white-space: nowrap;
 }
 
-.progress-dots button.is-active {
-  background: var(--dot);
-  transform: scale(1.65);
+.scroll-hint i {
+  width: 12px;
+  height: 12px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  animation: hint-bounce 1.45s ease-in-out infinite;
+}
+
+.scroll-hint.is-hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+  pointer-events: none;
 }
 
 .story-spacer {
@@ -140,26 +170,28 @@ body {
 
 .story-spacer span {
   display: block;
-  height: 100svh;
+  height: 100dvh;
 }
 
-@media (min-width: 820px) {
-  .progress-dots {
-    left: auto;
-    right: 18px;
-    top: 50%;
-    bottom: auto;
-    flex-direction: column;
-    transform: translateY(-50%);
+@keyframes hint-bounce {
+  0%,
+  100% {
+    translate: 0 -2px;
+    opacity: 0.5;
+  }
+
+  50% {
+    translate: 0 4px;
+    opacity: 1;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .poster-story {
-    min-height: 100svh;
+    min-height: 100dvh;
   }
 
-  .progress-dots {
-    display: none;
+  .scroll-hint i {
+    animation: none;
   }
 }

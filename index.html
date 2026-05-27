@@ -44,7 +44,10 @@
               aria-label="Открыть анкету гостя"
             ></a>
           </div>
-          <nav class="progress-dots" aria-label="Этапы приглашения"></nav>
+          <div class="scroll-hint" aria-hidden="true">
+            <span>листайте вниз</span>
+            <i></i>
+          </div>
         </div>
         <div class="story-spacer" aria-hidden="true"></div>
       </section>
@@ -58,6 +61,7 @@
           title: "Общий вид",
           box: { x: 0, y: 0, width: 1080, height: 1920 },
           zoom: 1,
+          fit: "contain",
         },
         {
           id: "intro",
@@ -131,17 +135,12 @@
       const spacer = document.querySelector(".story-spacer");
       const camera = document.querySelector(".story-camera");
       const poster = document.querySelector(".poster-map");
-      const dots = document.querySelector(".progress-dots");
+      const scrollHint = document.querySelector(".scroll-hint");
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      let activeStep = -1;
 
       story.style.setProperty("--step-count", steps.length);
       spacer.innerHTML = steps.map(() => "<span></span>").join("");
-      dots.innerHTML = steps
-        .map((step, index) => `<button type="button" data-step="${index}" aria-label="${step.title}"></button>`)
-        .join("");
 
-      const dotButtons = [...dots.querySelectorAll("button")];
       const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
       const mix = (from, to, progress) => from + (to - from) * progress;
       const ease = (value) => value * value * (3 - 2 * value);
@@ -149,6 +148,17 @@
       const getCameraForStep = (step) => {
         const viewportWidth = camera.clientWidth;
         const viewportHeight = camera.clientHeight;
+
+        if (step.fit === "contain") {
+          const scale = Math.min(viewportWidth / POSTER.width, viewportHeight / POSTER.height);
+
+          return {
+            scale,
+            x: (viewportWidth - POSTER.width * scale) / 2,
+            y: (viewportHeight - POSTER.height * scale) / 2,
+          };
+        }
+
         const safeWidth = viewportWidth - Math.min(72, viewportWidth * 0.12);
         const safeHeight = viewportHeight - Math.min(96, viewportHeight * 0.12);
         const coverScale = Math.max(viewportWidth / POSTER.width, viewportHeight / POSTER.height);
@@ -193,29 +203,10 @@
           x: mix(current.x, next.x, amount),
           y: mix(current.y, next.y, amount),
         };
-        const nearest = clamp(Math.round(position), 0, steps.length - 1);
 
         poster.style.transform = `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${transform.scale})`;
-
-        if (nearest !== activeStep) {
-          activeStep = nearest;
-          dotButtons.forEach((dot, dotIndex) => {
-            dot.classList.toggle("is-active", dotIndex === activeStep);
-          });
-        }
+        scrollHint.classList.toggle("is-hidden", progress > 0.04);
       };
-
-      dotButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-          const index = Number(button.dataset.step);
-          const maxScroll = story.offsetHeight - window.innerHeight;
-
-          window.scrollTo({
-            top: story.offsetTop + (maxScroll * index) / (steps.length - 1),
-            behavior: prefersReducedMotion ? "auto" : "smooth",
-          });
-        });
-      });
 
       window.addEventListener("scroll", render, { passive: true });
       document.addEventListener("scroll", render, { passive: true });
