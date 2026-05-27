@@ -11,12 +11,12 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-    <main class="page-shell" aria-label="Свадебное приглашение">
-      <section class="guided-invite" aria-label="Маршрут по свадебному приглашению">
-        <div class="camera">
-          <div class="invitation" role="img" aria-label="Приглашение на свадьбу Антона и Лизаветы">
+    <main class="story-shell" aria-label="Свадебное приглашение">
+      <section class="poster-story" aria-label="Интерактивный маршрут по свадебному приглашению">
+        <div class="story-camera">
+          <div class="poster-map" role="img" aria-label="Приглашение на свадьбу Антона и Лизаветы">
             <img
-              class="invite-art"
+              class="poster-image"
               src="assets/invitation.png"
               alt=""
               aria-hidden="true"
@@ -44,112 +44,185 @@
               aria-label="Открыть анкету гостя"
             ></a>
           </div>
+          <nav class="progress-dots" aria-label="Этапы приглашения"></nav>
         </div>
-        <div class="chapters" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
+        <div class="story-spacer" aria-hidden="true"></div>
       </section>
     </main>
+
     <script>
-      const source = { width: 1080, height: 1920 };
-      const frames = [
-        { box: { x: 20, y: 20, width: 760, height: 560 } },
-        { box: { x: 85, y: 270, width: 500, height: 320 } },
-        { box: { x: 30, y: 610, width: 560, height: 430 } },
-        { box: { x: 105, y: 910, width: 850, height: 380 } },
-        { box: { x: 20, y: 1170, width: 680, height: 430 } },
-        { box: { x: 545, y: 1180, width: 500, height: 430 } },
-        { box: { x: 185, y: 1515, width: 760, height: 385 } },
+      const POSTER = { width: 1080, height: 1920 };
+      const steps = [
+        {
+          id: "overview",
+          title: "Общий вид",
+          box: { x: 0, y: 0, width: 1080, height: 1920 },
+          zoom: 1,
+        },
+        {
+          id: "intro",
+          title: "Приветствие",
+          box: { x: 35, y: 170, width: 500, height: 230 },
+          zoom: 1.08,
+        },
+        {
+          id: "names",
+          title: "Имена",
+          box: { x: 760, y: 70, width: 275, height: 300 },
+          zoom: 1.08,
+        },
+        {
+          id: "date",
+          title: "Дата",
+          box: { x: 55, y: 610, width: 535, height: 335 },
+          zoom: 1.04,
+        },
+        {
+          id: "place",
+          title: "Место",
+          box: { x: 145, y: 345, width: 355, height: 165 },
+          zoom: 1.1,
+        },
+        {
+          id: "timing",
+          title: "Тайминг",
+          box: { x: 155, y: 900, width: 650, height: 300 },
+          zoom: 1.02,
+        },
+        {
+          id: "personal",
+          title: "Личный блок",
+          box: { x: 610, y: 870, width: 340, height: 295 },
+          zoom: 1.08,
+        },
+        {
+          id: "dress",
+          title: "Дресс-код",
+          box: { x: 40, y: 1160, width: 650, height: 430 },
+          zoom: 1.03,
+        },
+        {
+          id: "gifts",
+          title: "Подарки",
+          box: { x: 665, y: 1160, width: 360, height: 360 },
+          zoom: 1.08,
+        },
+        {
+          id: "flowers",
+          title: "Цветы",
+          box: { x: 735, y: 1450, width: 315, height: 300 },
+          zoom: 1.12,
+        },
+        {
+          id: "form",
+          title: "Анкета",
+          box: { x: 155, y: 1540, width: 760, height: 330 },
+          zoom: 1.02,
+        },
+        {
+          id: "final",
+          title: "Финал",
+          box: { x: 240, y: 1760, width: 600, height: 155 },
+          zoom: 1.18,
+        },
       ];
 
-      const page = document.querySelector(".guided-invite");
-      const camera = document.querySelector(".camera");
-      const invitation = document.querySelector(".invitation");
+      const story = document.querySelector(".poster-story");
+      const spacer = document.querySelector(".story-spacer");
+      const camera = document.querySelector(".story-camera");
+      const poster = document.querySelector(".poster-map");
+      const dots = document.querySelector(".progress-dots");
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let activeStep = -1;
 
-      page.style.setProperty("--frame-count", frames.length + 1);
+      story.style.setProperty("--step-count", steps.length);
+      spacer.innerHTML = steps.map(() => "<span></span>").join("");
+      dots.innerHTML = steps
+        .map((step, index) => `<button type="button" data-step="${index}" aria-label="${step.title}"></button>`)
+        .join("");
 
+      const dotButtons = [...dots.querySelectorAll("button")];
       const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-      const mix = (from, to, amount) => from + (to - from) * amount;
+      const mix = (from, to, progress) => from + (to - from) * progress;
       const ease = (value) => value * value * (3 - 2 * value);
-      let lastState = "";
 
-      const getTarget = (frame) => {
-        const cameraWidth = camera.clientWidth;
-        const cameraHeight = camera.clientHeight;
-        const pad = clamp(cameraWidth * 0.08, 22, 42);
-        const box = frame.box;
-        const coverScale = Math.max(cameraWidth / source.width, cameraHeight / source.height);
-        const fitBoxScale = Math.min(
-          (cameraWidth - pad * 2) / box.width,
-          (cameraHeight - pad * 2) / box.height
-        );
-        const scale = Math.max(coverScale, fitBoxScale);
-        const scaledWidth = source.width * scale;
-        const scaledHeight = source.height * scale;
-        const boxCenterX = (box.x + box.width / 2) * scale;
-        const boxCenterY = (box.y + box.height / 2) * scale;
-        const minX = Math.min(0, cameraWidth - scaledWidth);
-        const minY = Math.min(0, cameraHeight - scaledHeight);
+      const getCameraForStep = (step) => {
+        const viewportWidth = camera.clientWidth;
+        const viewportHeight = camera.clientHeight;
+        const safeWidth = viewportWidth - Math.min(72, viewportWidth * 0.12);
+        const safeHeight = viewportHeight - Math.min(96, viewportHeight * 0.12);
+        const coverScale = Math.max(viewportWidth / POSTER.width, viewportHeight / POSTER.height);
+        const boxScale = Math.min(safeWidth / step.box.width, safeHeight / step.box.height) * step.zoom;
+        const scale = Math.max(coverScale, boxScale);
+        const scaledWidth = POSTER.width * scale;
+        const scaledHeight = POSTER.height * scale;
+        const boxCenterX = (step.box.x + step.box.width / 2) * scale;
+        const boxCenterY = (step.box.y + step.box.height / 2) * scale;
+        const minX = Math.min(0, viewportWidth - scaledWidth);
+        const minY = Math.min(0, viewportHeight - scaledHeight);
 
         return {
           scale,
-          x: clamp(cameraWidth / 2 - boxCenterX, minX, 0),
-          y: clamp(cameraHeight / 2 - boxCenterY, minY, 0),
+          x: clamp(viewportWidth / 2 - boxCenterX, minX, 0),
+          y: clamp(viewportHeight / 2 - boxCenterY, minY, 0),
         };
       };
 
-      const getFrame = (progress) => {
-        const position = progress * (frames.length - 1);
-        const index = Math.min(Math.floor(position), frames.length - 2);
-        const amount = ease(position - index);
-        const current = getTarget(frames[index]);
-        const next = getTarget(frames[index + 1]);
+      const getProgress = () => {
+        const rect = story.getBoundingClientRect();
+        const distance = story.offsetHeight - window.innerHeight;
+        return distance > 0 ? clamp(-rect.top / distance, 0, 1) : 0;
+      };
 
-        return {
+      const render = () => {
+        if (prefersReducedMotion) {
+          const scale = Math.min(window.innerWidth / POSTER.width, window.innerHeight / POSTER.height);
+          const x = (window.innerWidth - POSTER.width * scale) / 2;
+          poster.style.transform = `translate3d(${x}px, 0, 0) scale(${scale})`;
+          return;
+        }
+
+        const progress = getProgress();
+        const position = progress * (steps.length - 1);
+        const index = Math.min(Math.floor(position), steps.length - 2);
+        const amount = ease(position - index);
+        const current = getCameraForStep(steps[index]);
+        const next = getCameraForStep(steps[index + 1]);
+        const transform = {
           scale: mix(current.scale, next.scale, amount),
           x: mix(current.x, next.x, amount),
           y: mix(current.y, next.y, amount),
         };
+        const nearest = clamp(Math.round(position), 0, steps.length - 1);
+
+        poster.style.transform = `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${transform.scale})`;
+
+        if (nearest !== activeStep) {
+          activeStep = nearest;
+          dotButtons.forEach((dot, dotIndex) => {
+            dot.classList.toggle("is-active", dotIndex === activeStep);
+          });
+        }
       };
 
-      const render = () => {
-        const pageRect = page.getBoundingClientRect();
-        const distance = pageRect.height - window.innerHeight;
-        const progress = clamp(-pageRect.top / distance, 0, 1);
-        const frame = getFrame(progress);
+      dotButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const index = Number(button.dataset.step);
+          const maxScroll = story.offsetHeight - window.innerHeight;
 
-        invitation.style.transform = `translate3d(${frame.x}px, ${frame.y}px, 0) scale(${frame.scale})`;
-      };
+          window.scrollTo({
+            top: story.offsetTop + (maxScroll * index) / (steps.length - 1),
+            behavior: prefersReducedMotion ? "auto" : "smooth",
+          });
+        });
+      });
 
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        page.style.setProperty("--frame-count", 1);
-        invitation.style.transform = `translate3d(0, 0, 0) scale(${Math.max(
-          window.innerWidth / source.width,
-          window.innerHeight / source.height
-        )})`;
-      } else {
-        const syncRender = () => {
-          const state = `${window.scrollY}:${camera.clientWidth}:${camera.clientHeight}`;
-
-          if (state !== lastState) {
-            lastState = state;
-            render();
-          }
-        };
-
-        window.addEventListener("scroll", syncRender, { passive: true });
-        document.addEventListener("scroll", syncRender, { passive: true });
-        window.visualViewport?.addEventListener("resize", syncRender);
-        window.addEventListener("resize", syncRender);
-        window.setInterval(syncRender, 120);
-        render();
-      }
+      window.addEventListener("scroll", render, { passive: true });
+      document.addEventListener("scroll", render, { passive: true });
+      window.addEventListener("resize", render);
+      window.visualViewport?.addEventListener("resize", render);
+      window.setInterval(render, 120);
+      render();
     </script>
   </body>
 </html>

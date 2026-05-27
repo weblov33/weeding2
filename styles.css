@@ -1,6 +1,7 @@
 :root {
   --paper-bg: #f5f1f5;
   --focus: #c87538;
+  --dot: #63734c;
 }
 
 * {
@@ -14,54 +15,35 @@ body {
 
 body {
   margin: 0;
-  background: var(--paper-bg);
   overflow-x: hidden;
+  background: var(--paper-bg);
 }
 
-.page-shell {
+.story-shell {
   width: 100%;
   background: var(--paper-bg);
 }
 
-.guided-invite {
-  --frame-count: 8;
-  min-height: calc(var(--frame-count) * 100svh);
+.poster-story {
+  --step-count: 12;
+  position: relative;
+  min-height: calc(var(--step-count) * 100svh);
+  background: var(--paper-bg);
 }
 
-.camera {
+.story-camera {
   position: sticky;
   top: 0;
   width: 100%;
+  height: 100vh;
   height: 100svh;
-  contain: layout paint;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.88), transparent 36%),
-    linear-gradient(180deg, #fbf8fb 0%, var(--paper-bg) 52%, #eadfea 100%);
+  background: var(--paper-bg);
+  contain: layout paint;
   touch-action: pan-y;
 }
 
-.camera::before,
-.camera::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  pointer-events: none;
-}
-
-.camera::before {
-  background:
-    linear-gradient(90deg, rgba(245, 241, 245, 0.86), transparent 12%, transparent 88%, rgba(245, 241, 245, 0.86)),
-    linear-gradient(180deg, rgba(245, 241, 245, 0.76), transparent 10%, transparent 86%, rgba(245, 241, 245, 0.82));
-}
-
-.camera::after {
-  border: 1px solid rgba(79, 94, 56, 0.08);
-  box-shadow: inset 0 0 90px rgba(89, 54, 37, 0.08);
-}
-
-.invitation {
+.poster-map {
   position: absolute;
   left: 0;
   top: 0;
@@ -72,30 +54,28 @@ body {
   will-change: transform;
 }
 
-.invite-art {
+.poster-image {
   position: absolute;
   inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   user-select: none;
+  -webkit-user-drag: none;
 }
 
-.hotspot {
+.hotspot,
+.qr-layer {
   position: absolute;
   display: block;
-  border-radius: 16px;
-  z-index: 25;
+  z-index: 5;
 }
 
 .qr-layer {
-  position: absolute;
   left: 12.1%;
   top: 60.25%;
   width: 8.3%;
   aspect-ratio: 1;
-  display: block;
-  z-index: 25;
   cursor: pointer;
 }
 
@@ -112,50 +92,74 @@ body {
   top: 87.6%;
   width: 53.8%;
   height: 6.2%;
+  border-radius: 16px;
 }
 
-.hotspot:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 4px;
-}
-
+.hotspot:focus-visible,
 .qr-layer:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 4px;
+  outline: 4px solid var(--focus);
+  outline-offset: 6px;
 }
 
-.chapters {
+.progress-dots {
+  position: fixed;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  z-index: 20;
+  display: flex;
+  gap: 7px;
+  max-width: calc(100vw - 28px);
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(245, 241, 245, 0.72);
+  backdrop-filter: blur(10px);
+  transform: translateX(-50%);
+}
+
+.progress-dots button {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(99, 115, 76, 0.28);
+  cursor: pointer;
+}
+
+.progress-dots button.is-active {
+  background: var(--dot);
+  transform: scale(1.65);
+}
+
+.story-spacer {
   position: absolute;
   inset: 0 auto auto 0;
   width: 1px;
   pointer-events: none;
 }
 
-.chapters span {
+.story-spacer span {
   display: block;
   height: 100svh;
 }
 
+@media (min-width: 820px) {
+  .progress-dots {
+    left: auto;
+    right: 18px;
+    top: 50%;
+    bottom: auto;
+    flex-direction: column;
+    transform: translateY(-50%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .guided-invite {
+  .poster-story {
     min-height: 100svh;
   }
 
-  .camera {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+  .progress-dots {
+    display: none;
   }
-
-  .invitation {
-    position: relative;
-    left: auto;
-    top: auto;
-    width: min(100vw, 1080px);
-    height: auto;
-    aspect-ratio: 1080 / 1920;
-    transform: none;
-    transition: none;
-  }
-
 }
