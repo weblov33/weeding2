@@ -53,12 +53,12 @@
     </main>
     <script>
       const frames = [
-        { x: 0.42, y: 0.36, zoom: 1.55 },
-        { x: 0.28, y: 0.25, zoom: 2.2 },
-        { x: 0.28, y: 0.37, zoom: 2.15 },
-        { x: 0.54, y: 0.56, zoom: 1.95 },
-        { x: 0.24, y: 0.7, zoom: 2.1 },
-        { x: 0.48, y: 0.9, zoom: 1.9 },
+        { x: 0.5, y: 0.2, zoom: 1 },
+        { x: 0.3, y: 0.22, zoom: 1.25 },
+        { x: 0.28, y: 0.36, zoom: 1.24 },
+        { x: 0.54, y: 0.52, zoom: 1.2 },
+        { x: 0.24, y: 0.66, zoom: 1.22 },
+        { x: 0.46, y: 0.86, zoom: 1.2 },
         { x: 0.5, y: 0.5, zoom: 1 },
       ];
 
@@ -72,6 +72,7 @@
       const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
       const mix = (from, to, amount) => from + (to - from) * amount;
       const ease = (value) => value * value * (3 - 2 * value);
+      let ticking = false;
 
       const getFrame = (progress) => {
         const position = progress * (frames.length - 1);
@@ -93,17 +94,31 @@
         const scrollDistance = pageRect.height - window.innerHeight;
         const progress = clamp(-pageRect.top / scrollDistance, 0, 1);
         const frame = getFrame(progress);
+        const cameraWidth = camera.clientWidth;
+        const cameraHeight = camera.clientHeight;
         const width = invitation.offsetWidth;
         const height = invitation.offsetHeight;
         const zoom = frame.zoom;
-        const x = window.innerWidth / 2 - width * zoom * frame.x;
-        const y = window.innerHeight / 2 - height * zoom * frame.y;
+        const scaledWidth = width * zoom;
+        const scaledHeight = height * zoom;
+        const minX = Math.min(0, cameraWidth - scaledWidth);
+        const minY = Math.min(0, cameraHeight - scaledHeight);
+        const x = clamp(cameraWidth / 2 - scaledWidth * frame.x, minX, 0);
+        const y = clamp(cameraHeight / 2 - scaledHeight * frame.y, minY, 0);
 
         invitation.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${zoom})`;
         dots.forEach((dot, index) => {
           dot.classList.toggle("is-active", index === frame.active);
         });
         camera.classList.toggle("is-finished", progress > 0.97);
+        ticking = false;
+      };
+
+      const requestRender = () => {
+        if (!ticking) {
+          window.requestAnimationFrame(render);
+          ticking = true;
+        }
       };
 
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -111,8 +126,8 @@
         invitation.style.transform = "";
         dots[dots.length - 1]?.classList.add("is-active");
       } else {
-        window.addEventListener("scroll", render, { passive: true });
-        window.addEventListener("resize", render);
+        window.addEventListener("scroll", requestRender, { passive: true });
+        window.addEventListener("resize", requestRender);
         render();
       }
     </script>
