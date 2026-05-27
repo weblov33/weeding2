@@ -1,6 +1,8 @@
 :root {
   --paper-bg: #f5f1f5;
   --focus: #c87538;
+  --ink: #4f5e38;
+  --warm: #bf7b4d;
 }
 
 * {
@@ -24,7 +26,7 @@ body {
 }
 
 .guided-invite {
-  --frame-count: 7;
+  --frame-count: 8;
   min-height: calc(var(--frame-count) * 100svh);
 }
 
@@ -35,32 +37,58 @@ body {
   height: 100svh;
   contain: layout paint;
   overflow: hidden;
-  background: var(--paper-bg);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.88), transparent 36%),
+    linear-gradient(180deg, #fbf8fb 0%, var(--paper-bg) 52%, #eadfea 100%);
   touch-action: pan-y;
+}
+
+.camera::before,
+.camera::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.camera::before {
+  background:
+    linear-gradient(90deg, rgba(245, 241, 245, 0.86), transparent 12%, transparent 88%, rgba(245, 241, 245, 0.86)),
+    linear-gradient(180deg, rgba(245, 241, 245, 0.76), transparent 10%, transparent 86%, rgba(245, 241, 245, 0.82));
+}
+
+.camera::after {
+  border: 1px solid rgba(79, 94, 56, 0.08);
+  box-shadow: inset 0 0 90px rgba(89, 54, 37, 0.08);
 }
 
 .invitation {
   position: absolute;
   left: 0;
   top: 0;
-  width: min(1080px, max(100vw, calc(100svh * 1080 / 1920)));
-  aspect-ratio: 1080 / 1920;
+  width: 1080px;
+  height: 1920px;
   transform-origin: 0 0;
   backface-visibility: hidden;
+  transition: transform 920ms cubic-bezier(0.2, 0.72, 0.18, 1);
   will-change: transform;
 }
 
 .invite-art {
   position: absolute;
   inset: 0;
-  background: url("assets/invitation.png") center top / contain no-repeat;
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
 }
 
 .hotspot {
   position: absolute;
   display: block;
   border-radius: 16px;
-  z-index: 20;
+  z-index: 25;
 }
 
 .qr-layer {
@@ -70,7 +98,7 @@ body {
   width: 8.3%;
   aspect-ratio: 1;
   display: block;
-  z-index: 20;
+  z-index: 25;
   cursor: pointer;
 }
 
@@ -99,6 +127,23 @@ body {
   outline-offset: 4px;
 }
 
+.step-label {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  top: max(16px, env(safe-area-inset-top));
+  z-index: 40;
+  min-width: 74px;
+  padding: 8px 12px;
+  border: 1px solid rgba(79, 94, 56, 0.18);
+  border-radius: 999px;
+  background: rgba(251, 248, 251, 0.78);
+  color: var(--ink);
+  font: 600 13px/1.1 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
 .progress-dots {
   position: fixed;
   right: max(14px, env(safe-area-inset-right));
@@ -110,18 +155,18 @@ body {
 }
 
 .progress-dots span {
-  width: 6px;
+  width: 7px;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: rgba(92, 107, 68, 0.28);
+  background: rgba(79, 94, 56, 0.26);
   transition:
     background 180ms ease,
     transform 180ms ease;
 }
 
 .progress-dots .is-active {
-  background: rgba(92, 107, 68, 0.86);
-  transform: scale(1.55);
+  background: var(--ink);
+  transform: scale(1.7);
 }
 
 .scroll-cue {
@@ -131,14 +176,24 @@ body {
   z-index: 30;
   width: 18px;
   height: 18px;
-  border-right: 2px solid rgba(92, 107, 68, 0.55);
-  border-bottom: 2px solid rgba(92, 107, 68, 0.55);
+  border-right: 2px solid rgba(79, 94, 56, 0.55);
+  border-bottom: 2px solid rgba(79, 94, 56, 0.55);
   transform: translateX(-50%) rotate(45deg);
   animation: cue-breathe 1.7s ease-in-out infinite;
 }
 
 .camera.is-finished .scroll-cue {
   opacity: 0;
+}
+
+.chapters {
+  position: relative;
+  z-index: -1;
+}
+
+.chapters span {
+  display: block;
+  height: 100svh;
 }
 
 @keyframes cue-breathe {
@@ -162,14 +217,18 @@ body {
   .camera {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
   }
 
   .invitation {
     position: relative;
     left: auto;
     top: auto;
+    width: min(100vw, 1080px);
+    height: auto;
+    aspect-ratio: 1080 / 1920;
     transform: none;
+    transition: none;
   }
 
   .scroll-cue {

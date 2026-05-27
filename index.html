@@ -15,7 +15,13 @@
       <section class="guided-invite" aria-label="Маршрут по свадебному приглашению">
         <div class="camera">
           <div class="invitation" role="img" aria-label="Приглашение на свадьбу Антона и Лизаветы">
-            <span class="invite-art" aria-hidden="true"></span>
+            <img
+              class="invite-art"
+              src="assets/invitation.png"
+              alt=""
+              aria-hidden="true"
+              draggable="false"
+            >
             <a
               class="qr-layer"
               href="https://pin.it/30qIQ0UK0"
@@ -38,6 +44,7 @@
               aria-label="Открыть анкету гостя"
             ></a>
           </div>
+          <div class="step-label" aria-hidden="true">Начало</div>
           <div class="progress-dots" aria-hidden="true">
             <span></span>
             <span></span>
@@ -49,68 +56,72 @@
           </div>
           <span class="scroll-cue" aria-hidden="true"></span>
         </div>
+        <div class="chapters" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </section>
     </main>
     <script>
       const frames = [
-        { x: 0.5, y: 0.2, zoom: 1 },
-        { x: 0.3, y: 0.22, zoom: 1.25 },
-        { x: 0.28, y: 0.36, zoom: 1.24 },
-        { x: 0.54, y: 0.52, zoom: 1.2 },
-        { x: 0.24, y: 0.66, zoom: 1.22 },
-        { x: 0.46, y: 0.86, zoom: 1.2 },
-        { x: 0.5, y: 0.5, zoom: 1 },
+        { label: "Начало", x: 0.5, y: 0.2, zoom: 1 },
+        { label: "Место", x: 0.26, y: 0.22, zoom: 2.25 },
+        { label: "Дата", x: 0.25, y: 0.39, zoom: 2.05 },
+        { label: "Тайминг", x: 0.47, y: 0.55, zoom: 1.9 },
+        { label: "Дресс-код", x: 0.24, y: 0.72, zoom: 2.02 },
+        { label: "Анкета", x: 0.47, y: 0.9, zoom: 1.9 },
+        { label: "Финал", x: 0.5, y: 0.52, zoom: 1.08 },
       ];
 
       const page = document.querySelector(".guided-invite");
       const camera = document.querySelector(".camera");
       const invitation = document.querySelector(".invitation");
+      const stepLabel = document.querySelector(".step-label");
       const dots = document.querySelectorAll(".progress-dots span");
 
-      page.style.setProperty("--frame-count", frames.length);
+      page.style.setProperty("--frame-count", frames.length + 1);
 
       const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-      const mix = (from, to, amount) => from + (to - from) * amount;
-      const ease = (value) => value * value * (3 - 2 * value);
       let ticking = false;
+      let activeFrame = -1;
 
-      const getFrame = (progress) => {
-        const position = progress * (frames.length - 1);
-        const index = Math.min(Math.floor(position), frames.length - 2);
-        const amount = ease(position - index);
-        const current = frames[index];
-        const next = frames[index + 1];
+      const applyFrame = (index) => {
+        const frame = frames[index];
+        const cameraWidth = camera.clientWidth;
+        const cameraHeight = camera.clientHeight;
+        const fitScale = Math.max(cameraWidth / 1080, cameraHeight / 1920);
+        const scale = fitScale * frame.zoom;
+        const scaledWidth = 1080 * scale;
+        const scaledHeight = 1920 * scale;
+        const minX = Math.min(0, cameraWidth - scaledWidth);
+        const minY = Math.min(0, cameraHeight - scaledHeight);
+        const x = clamp(cameraWidth * 0.5 - scaledWidth * frame.x, minX, 0);
+        const y = clamp(cameraHeight * 0.5 - scaledHeight * frame.y, minY, 0);
 
-        return {
-          active: Math.round(position),
-          x: mix(current.x, next.x, amount),
-          y: mix(current.y, next.y, amount),
-          zoom: mix(current.zoom, next.zoom, amount),
-        };
+        invitation.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+        stepLabel.textContent = frame.label;
+        dots.forEach((dot, index) => {
+          dot.classList.toggle("is-active", index === activeFrame);
+        });
+        camera.classList.toggle("is-finished", index === frames.length - 1);
       };
 
       const render = () => {
-        const pageRect = page.getBoundingClientRect();
-        const scrollDistance = pageRect.height - window.innerHeight;
-        const progress = clamp(-pageRect.top / scrollDistance, 0, 1);
-        const frame = getFrame(progress);
-        const cameraWidth = camera.clientWidth;
-        const cameraHeight = camera.clientHeight;
-        const width = invitation.offsetWidth;
-        const height = invitation.offsetHeight;
-        const zoom = frame.zoom;
-        const scaledWidth = width * zoom;
-        const scaledHeight = height * zoom;
-        const minX = Math.min(0, cameraWidth - scaledWidth);
-        const minY = Math.min(0, cameraHeight - scaledHeight);
-        const x = clamp(cameraWidth / 2 - scaledWidth * frame.x, minX, 0);
-        const y = clamp(cameraHeight / 2 - scaledHeight * frame.y, minY, 0);
+        const pageTop = page.offsetTop;
+        const stepHeight = window.innerHeight;
+        const rawStep = (window.scrollY - pageTop + stepHeight * 0.42) / stepHeight;
+        const nextFrame = clamp(Math.floor(rawStep), 0, frames.length - 1);
 
-        invitation.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${zoom})`;
-        dots.forEach((dot, index) => {
-          dot.classList.toggle("is-active", index === frame.active);
-        });
-        camera.classList.toggle("is-finished", progress > 0.97);
+        if (nextFrame !== activeFrame) {
+          activeFrame = nextFrame;
+          applyFrame(activeFrame);
+        }
+
         ticking = false;
       };
 
@@ -124,10 +135,14 @@
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         page.style.setProperty("--frame-count", 1);
         invitation.style.transform = "";
+        stepLabel.textContent = "Приглашение";
         dots[dots.length - 1]?.classList.add("is-active");
       } else {
         window.addEventListener("scroll", requestRender, { passive: true });
-        window.addEventListener("resize", requestRender);
+        window.addEventListener("resize", () => {
+          activeFrame = -1;
+          requestRender();
+        });
         render();
       }
     </script>
