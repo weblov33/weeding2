@@ -44,17 +44,6 @@
               aria-label="Открыть анкету гостя"
             ></a>
           </div>
-          <div class="step-label" aria-hidden="true">Начало</div>
-          <div class="progress-dots" aria-hidden="true">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <span class="scroll-cue" aria-hidden="true"></span>
         </div>
         <div class="chapters" aria-hidden="true">
           <span></span>
@@ -68,81 +57,97 @@
       </section>
     </main>
     <script>
+      const source = { width: 1080, height: 1920 };
       const frames = [
-        { label: "Начало", x: 0.5, y: 0.2, zoom: 1 },
-        { label: "Место", x: 0.26, y: 0.22, zoom: 2.25 },
-        { label: "Дата", x: 0.25, y: 0.39, zoom: 2.05 },
-        { label: "Тайминг", x: 0.47, y: 0.55, zoom: 1.9 },
-        { label: "Дресс-код", x: 0.24, y: 0.72, zoom: 2.02 },
-        { label: "Анкета", x: 0.47, y: 0.9, zoom: 1.9 },
-        { label: "Финал", x: 0.5, y: 0.52, zoom: 1.08 },
+        { box: { x: 20, y: 20, width: 760, height: 560 } },
+        { box: { x: 85, y: 270, width: 500, height: 320 } },
+        { box: { x: 30, y: 610, width: 560, height: 430 } },
+        { box: { x: 105, y: 910, width: 850, height: 380 } },
+        { box: { x: 20, y: 1170, width: 680, height: 430 } },
+        { box: { x: 545, y: 1180, width: 500, height: 430 } },
+        { box: { x: 185, y: 1515, width: 760, height: 385 } },
       ];
 
       const page = document.querySelector(".guided-invite");
       const camera = document.querySelector(".camera");
       const invitation = document.querySelector(".invitation");
-      const stepLabel = document.querySelector(".step-label");
-      const dots = document.querySelectorAll(".progress-dots span");
 
       page.style.setProperty("--frame-count", frames.length + 1);
 
       const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-      let ticking = false;
-      let activeFrame = -1;
+      const mix = (from, to, amount) => from + (to - from) * amount;
+      const ease = (value) => value * value * (3 - 2 * value);
+      let lastState = "";
 
-      const applyFrame = (index) => {
-        const frame = frames[index];
+      const getTarget = (frame) => {
         const cameraWidth = camera.clientWidth;
         const cameraHeight = camera.clientHeight;
-        const fitScale = Math.max(cameraWidth / 1080, cameraHeight / 1920);
-        const scale = fitScale * frame.zoom;
-        const scaledWidth = 1080 * scale;
-        const scaledHeight = 1920 * scale;
+        const pad = clamp(cameraWidth * 0.08, 22, 42);
+        const box = frame.box;
+        const coverScale = Math.max(cameraWidth / source.width, cameraHeight / source.height);
+        const fitBoxScale = Math.min(
+          (cameraWidth - pad * 2) / box.width,
+          (cameraHeight - pad * 2) / box.height
+        );
+        const scale = Math.max(coverScale, fitBoxScale);
+        const scaledWidth = source.width * scale;
+        const scaledHeight = source.height * scale;
+        const boxCenterX = (box.x + box.width / 2) * scale;
+        const boxCenterY = (box.y + box.height / 2) * scale;
         const minX = Math.min(0, cameraWidth - scaledWidth);
         const minY = Math.min(0, cameraHeight - scaledHeight);
-        const x = clamp(cameraWidth * 0.5 - scaledWidth * frame.x, minX, 0);
-        const y = clamp(cameraHeight * 0.5 - scaledHeight * frame.y, minY, 0);
 
-        invitation.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
-        stepLabel.textContent = frame.label;
-        dots.forEach((dot, index) => {
-          dot.classList.toggle("is-active", index === activeFrame);
-        });
-        camera.classList.toggle("is-finished", index === frames.length - 1);
+        return {
+          scale,
+          x: clamp(cameraWidth / 2 - boxCenterX, minX, 0),
+          y: clamp(cameraHeight / 2 - boxCenterY, minY, 0),
+        };
+      };
+
+      const getFrame = (progress) => {
+        const position = progress * (frames.length - 1);
+        const index = Math.min(Math.floor(position), frames.length - 2);
+        const amount = ease(position - index);
+        const current = getTarget(frames[index]);
+        const next = getTarget(frames[index + 1]);
+
+        return {
+          scale: mix(current.scale, next.scale, amount),
+          x: mix(current.x, next.x, amount),
+          y: mix(current.y, next.y, amount),
+        };
       };
 
       const render = () => {
-        const pageTop = page.offsetTop;
-        const stepHeight = window.innerHeight;
-        const rawStep = (window.scrollY - pageTop + stepHeight * 0.42) / stepHeight;
-        const nextFrame = clamp(Math.floor(rawStep), 0, frames.length - 1);
+        const pageRect = page.getBoundingClientRect();
+        const distance = pageRect.height - window.innerHeight;
+        const progress = clamp(-pageRect.top / distance, 0, 1);
+        const frame = getFrame(progress);
 
-        if (nextFrame !== activeFrame) {
-          activeFrame = nextFrame;
-          applyFrame(activeFrame);
-        }
-
-        ticking = false;
-      };
-
-      const requestRender = () => {
-        if (!ticking) {
-          window.requestAnimationFrame(render);
-          ticking = true;
-        }
+        invitation.style.transform = `translate3d(${frame.x}px, ${frame.y}px, 0) scale(${frame.scale})`;
       };
 
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         page.style.setProperty("--frame-count", 1);
-        invitation.style.transform = "";
-        stepLabel.textContent = "Приглашение";
-        dots[dots.length - 1]?.classList.add("is-active");
+        invitation.style.transform = `translate3d(0, 0, 0) scale(${Math.max(
+          window.innerWidth / source.width,
+          window.innerHeight / source.height
+        )})`;
       } else {
-        window.addEventListener("scroll", requestRender, { passive: true });
-        window.addEventListener("resize", () => {
-          activeFrame = -1;
-          requestRender();
-        });
+        const syncRender = () => {
+          const state = `${window.scrollY}:${camera.clientWidth}:${camera.clientHeight}`;
+
+          if (state !== lastState) {
+            lastState = state;
+            render();
+          }
+        };
+
+        window.addEventListener("scroll", syncRender, { passive: true });
+        document.addEventListener("scroll", syncRender, { passive: true });
+        window.visualViewport?.addEventListener("resize", syncRender);
+        window.addEventListener("resize", syncRender);
+        window.setInterval(syncRender, 120);
         render();
       }
     </script>
