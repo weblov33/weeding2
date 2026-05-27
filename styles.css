@@ -15,28 +15,53 @@ body {
 body {
   margin: 0;
   background: var(--paper-bg);
+  overflow-x: hidden;
 }
 
 .page-shell {
   width: 100%;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
   background: var(--paper-bg);
 }
 
+.guided-invite {
+  --frame-count: 7;
+  min-height: calc(var(--frame-count) * 100svh);
+}
+
+.camera {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 12%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 28%),
+    var(--paper-bg);
+}
+
 .invitation {
-  position: relative;
+  position: absolute;
+  left: 0;
+  top: 0;
   width: min(100vw, 1080px);
+  max-width: calc(100svh * 1080 / 1920);
   aspect-ratio: 1080 / 1920;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.invite-art {
+  position: absolute;
+  inset: 0;
   background: url("assets/invitation.png") center top / contain no-repeat;
+  filter: drop-shadow(0 18px 36px rgba(91, 55, 38, 0.08));
 }
 
 .hotspot {
   position: absolute;
   display: block;
   border-radius: 16px;
+  z-index: 20;
 }
 
 .qr-layer {
@@ -73,4 +98,87 @@ body {
 .qr-layer:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 4px;
+}
+
+.progress-dots {
+  position: fixed;
+  right: max(14px, env(safe-area-inset-right));
+  top: 50%;
+  z-index: 30;
+  display: grid;
+  gap: 8px;
+  transform: translateY(-50%);
+}
+
+.progress-dots span {
+  width: 6px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(92, 107, 68, 0.28);
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.progress-dots .is-active {
+  background: rgba(92, 107, 68, 0.86);
+  transform: scale(1.55);
+}
+
+.scroll-cue {
+  position: fixed;
+  left: 50%;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 30;
+  width: 18px;
+  height: 18px;
+  border-right: 2px solid rgba(92, 107, 68, 0.55);
+  border-bottom: 2px solid rgba(92, 107, 68, 0.55);
+  transform: translateX(-50%) rotate(45deg);
+  animation: cue-breathe 1.7s ease-in-out infinite;
+}
+
+.camera.is-finished .scroll-cue {
+  opacity: 0;
+}
+
+@keyframes cue-breathe {
+  0%,
+  100% {
+    opacity: 0.25;
+    translate: 0 -3px;
+  }
+
+  50% {
+    opacity: 0.75;
+    translate: 0 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guided-invite {
+    min-height: 100svh;
+  }
+
+  .camera {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .invitation {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+  }
+
+  .scroll-cue {
+    display: none;
+    animation: none;
+  }
+
+  .progress-dots span {
+    transition: none;
+  }
 }
