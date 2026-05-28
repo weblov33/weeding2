@@ -52,12 +52,16 @@
             <b>Маршрут приглашения</b>
             <span>нажимайте дальше</span>
           </div>
-          <button class="step-control" type="button" aria-live="polite">
+          <button class="step-control" data-position="bottom" data-variant="route" type="button" aria-live="polite">
             <span class="step-control__eyebrow">маршрут</span>
             <b>Дальше</b>
             <i aria-hidden="true"></i>
           </button>
           <div class="intro-gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+            <div class="confetti-field" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
             <div class="intro-gate__panel">
               <p>Официальное приглашение</p>
               <h1 id="gate-title">Вас приглашают на свадьбу</h1>
@@ -82,6 +86,8 @@
           title: "Общий вид",
           cue: "Сначала вся карта целиком",
           cuePosition: "bottom",
+          buttonPosition: "bottom",
+          motion: "reveal",
           box: { x: 0, y: 0, width: 1080, height: 1920 },
           zoom: 1,
           fit: "contain",
@@ -91,55 +97,69 @@
           title: "Приветствие",
           cue: "чтобы продолжить, нажмите кнопку",
           cuePosition: "bottom",
-          box: { x: 0, y: 95, width: 560, height: 380 },
-          zoom: 1.02,
+          buttonPosition: "bottom",
+          motion: "float",
+          box: { x: 0, y: 100, width: 620, height: 360 },
+          zoom: 1,
         },
         {
           id: "names",
           title: "Антон и Лизавета",
           cue: "дальше место и дата",
           cuePosition: "bottom",
-          box: { x: 705, y: 20, width: 350, height: 360 },
-          zoom: 1.02,
+          buttonPosition: "bottom",
+          motion: "arc",
+          box: { x: 690, y: 20, width: 385, height: 350 },
+          zoom: 1,
         },
         {
           id: "place",
           title: "Место",
           cue: "ниже отмечена дата",
           cuePosition: "bottom",
-          box: { x: 80, y: 315, width: 360, height: 165 },
-          zoom: 1.04,
+          buttonPosition: "bottom",
+          motion: "settle",
+          box: { x: 70, y: 300, width: 490, height: 235 },
+          zoom: 1,
         },
         {
           id: "date",
           title: "18 сентября",
           cue: "дальше тайминг",
           cuePosition: "top",
-          box: { x: 35, y: 545, width: 410, height: 360 },
-          zoom: 1.02,
+          buttonPosition: "bottom",
+          motion: "float",
+          box: { x: 35, y: 545, width: 475, height: 390 },
+          zoom: 1,
         },
         {
           id: "timing",
           title: "Тайминг",
           cue: "дальше маленький личный блок",
           cuePosition: "top",
-          box: { x: 80, y: 835, width: 580, height: 310 },
-          zoom: 1.01,
+          buttonPosition: "bottom",
+          motion: "arc",
+          box: { x: 70, y: 840, width: 620, height: 320 },
+          zoom: 1,
         },
         {
           id: "personal",
           title: "Личный блок",
           cue: "следом дресс-код",
           cuePosition: "top",
-          box: { x: 560, y: 835, width: 360, height: 300 },
-          zoom: 1.03,
+          buttonPosition: "bottom",
+          motion: "settle",
+          box: { x: 550, y: 820, width: 410, height: 335 },
+          zoom: 1,
         },
         {
           id: "dress",
           title: "Дресс-код",
           cue: "дальше пожелания",
           cuePosition: "top",
-          box: { x: 20, y: 1165, width: 610, height: 390 },
+          buttonPosition: "top",
+          motion: "float",
+          box: { x: 15, y: 1140, width: 650, height: 440 },
           zoom: 1,
         },
         {
@@ -147,23 +167,29 @@
           title: "Подарки",
           cue: "еще ниже про цветы",
           cuePosition: "top",
-          box: { x: 640, y: 1195, width: 400, height: 345 },
-          zoom: 1.02,
+          buttonPosition: "top",
+          motion: "arc",
+          box: { x: 620, y: 1180, width: 440, height: 385 },
+          zoom: 1,
         },
         {
           id: "flowers",
           title: "Цветы",
           cue: "дальше анкета гостя",
           cuePosition: "top",
-          box: { x: 675, y: 1460, width: 385, height: 310 },
-          zoom: 1.03,
+          buttonPosition: "top",
+          motion: "settle",
+          box: { x: 650, y: 1425, width: 420, height: 370 },
+          zoom: 1,
         },
         {
           id: "form",
           title: "Анкета гостя",
           cue: "здесь можно открыть анкету",
           cuePosition: "top",
-          box: { x: 180, y: 1565, width: 670, height: 270 },
+          buttonPosition: "top",
+          motion: "grand",
+          box: { x: 120, y: 1540, width: 830, height: 300 },
           zoom: 1,
         },
         {
@@ -171,7 +197,9 @@
           title: "До встречи",
           cue: "до встречи на празднике",
           cuePosition: "top",
-          box: { x: 135, y: 1735, width: 785, height: 170 },
+          buttonPosition: "top",
+          motion: "settle",
+          box: { x: 110, y: 1705, width: 850, height: 210 },
           zoom: 1,
         },
         {
@@ -179,6 +207,8 @@
           title: "Общий вид",
           cue: "приглашение целиком",
           cuePosition: "bottom",
+          buttonPosition: "bottom",
+          motion: "grand",
           box: { x: 0, y: 0, width: 1080, height: 1920 },
           zoom: 1,
           fit: "contain",
@@ -203,6 +233,7 @@
       let transitionFromFrame;
       let transitionStartedAt = 0;
       let transitionDuration = 1250;
+      let transitionEase = (value) => value;
 
       if ("scrollRestoration" in history) {
         history.scrollRestoration = "manual";
@@ -217,6 +248,13 @@
       const easeInOutSine = (value) => 0.5 - Math.cos(Math.PI * value) / 2;
       const easeInOutCubic = (value) =>
         value < 0.5 ? 4 * value * value * value : 1 - Math.pow(-2 * value + 2, 3) / 2;
+      const easings = {
+        reveal: easeInOutCubic,
+        float: easeInOutSine,
+        arc: (value) => 1 - Math.pow(1 - value, 3),
+        settle: (value) => 1 - Math.pow(1 - value, 4),
+        grand: (value) => value < 0.5 ? 8 * value * value * value * value : 1 - Math.pow(-2 * value + 2, 4) / 2,
+      };
 
       const getViewportSize = () => ({
         width: Math.round(window.visualViewport?.width || window.innerWidth || camera.clientWidth),
@@ -244,7 +282,7 @@
         const safeHeight = viewportHeight - Math.min(72, viewportHeight * 0.1);
         const coverScale = Math.max(viewportWidth / POSTER.width, viewportHeight / POSTER.height);
         const boxScale = Math.min(safeWidth / step.box.width, safeHeight / step.box.height) * step.zoom;
-        const maxScale = viewportWidth >= 900 ? 1.64 : viewportWidth >= 640 ? 1.34 : 1.08;
+        const maxScale = viewportWidth >= 900 ? 1.36 : viewportWidth >= 640 ? 1.22 : 1.08;
         const scale = Math.max(coverScale, Math.min(boxScale, maxScale));
         const scaledWidth = POSTER.width * scale;
         const scaledHeight = POSTER.height * scale;
@@ -318,7 +356,7 @@
         }
 
         if (transitionFromFrame) {
-          const amount = easeInOutCubic(clamp((timestamp - transitionStartedAt) / transitionDuration, 0, 1));
+          const amount = transitionEase(clamp((timestamp - transitionStartedAt) / transitionDuration, 0, 1));
 
           paintedFrame = {
             x: mix(transitionFromFrame.x, targetFrame.x, amount),
@@ -371,6 +409,8 @@
         activeStepIndex = index;
         const step = steps[index];
         journeyCue.dataset.position = step.cuePosition || "bottom";
+        stepControl.dataset.position = step.buttonPosition || "bottom";
+        stepControl.dataset.variant = step.motion || "route";
         journeyCue.querySelector("b").textContent = step.title;
         journeyCue.querySelector("span").textContent = step.cue;
 
@@ -404,7 +444,10 @@
 
         transitionFromFrame = { ...paintedFrame };
         transitionStartedAt = performance.now();
-        transitionDuration = options.duration || (Math.abs(nextFrame.scale - transitionFromFrame.scale) > 0.8 ? 1450 : 1180);
+        transitionDuration =
+          options.duration ||
+          (steps[nextIndex].motion === "grand" ? 1680 : Math.abs(nextFrame.scale - transitionFromFrame.scale) > 0.8 ? 1450 : 1220);
+        transitionEase = easings[steps[nextIndex].motion] || easeInOutCubic;
         stepControl.disabled = true;
         queueDraw();
       };
