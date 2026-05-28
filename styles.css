@@ -21,6 +21,10 @@ body {
   overscroll-behavior-x: none;
 }
 
+body.story-is-gated {
+  overflow: hidden;
+}
+
 .story-shell {
   width: 100%;
   background: var(--paper-bg);
@@ -78,6 +82,11 @@ body {
   backface-visibility: hidden;
   will-change: transform;
   filter: drop-shadow(0 18px 38px rgba(78, 59, 78, 0.08));
+  transition: filter 520ms ease;
+}
+
+.story-is-gated .poster-map {
+  filter: blur(6px) saturate(0.92) drop-shadow(0 18px 38px rgba(78, 59, 78, 0.08));
 }
 
 .poster-image {
@@ -177,6 +186,146 @@ body {
   pointer-events: none;
 }
 
+.journey-cue {
+  position: absolute;
+  left: 50%;
+  z-index: 19;
+  display: grid;
+  gap: 2px;
+  min-width: min(270px, calc(100vw - 36px));
+  max-width: min(330px, calc(100vw - 36px));
+  padding: 10px 15px 11px;
+  border: 1px solid rgba(200, 117, 56, 0.22);
+  border-radius: 18px 22px 20px 16px;
+  background: rgba(255, 255, 255, 0.68);
+  color: #64734d;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 30px rgba(74, 59, 74, 0.08);
+  transition: opacity 260ms ease, transform 260ms ease, top 260ms ease, bottom 260ms ease;
+}
+
+.journey-cue b {
+  color: #151515;
+  font: 800 15px/1.05 "Trebuchet MS", system-ui, sans-serif;
+}
+
+.journey-cue span {
+  font: 700 13px/1.15 "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+}
+
+.journey-cue[data-position="top"] {
+  top: max(12px, calc(env(safe-area-inset-top) + 10px));
+  bottom: auto;
+  transform: translateX(-50%) translateY(-8px);
+}
+
+.journey-cue[data-position="bottom"] {
+  top: auto;
+  bottom: max(18px, calc(env(safe-area-inset-bottom) + 16px));
+  transform: translateX(-50%) translateY(8px);
+}
+
+.journey-cue.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.intro-gate {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: max(18px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.34), rgba(245, 241, 245, 0.62) 60%, rgba(245, 241, 245, 0.8)),
+    linear-gradient(180deg, rgba(245, 241, 245, 0.36), rgba(245, 241, 245, 0.68));
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 420ms ease, visibility 420ms ease;
+}
+
+.intro-gate__panel {
+  width: min(420px, 100%);
+  padding: 26px 24px 24px;
+  border: 2px solid rgba(200, 117, 56, 0.22);
+  border-radius: 34px 28px 36px 30px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #222;
+  text-align: center;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 20px 54px rgba(63, 47, 63, 0.14);
+}
+
+.intro-gate__panel p {
+  margin: 0 0 8px;
+  color: #c87538;
+  font: 800 13px/1.2 "Trebuchet MS", system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.intro-gate__panel h1 {
+  margin: 0;
+  font: 800 clamp(31px, 8vw, 48px) / 0.95 "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+  letter-spacing: 0;
+}
+
+.intro-gate__panel strong {
+  display: block;
+  margin: 13px 0 14px;
+  color: #63734c;
+  font: 800 19px/1.15 "Trebuchet MS", system-ui, sans-serif;
+}
+
+.intro-gate__panel span {
+  display: block;
+  margin: 0 auto 22px;
+  max-width: 31ch;
+  color: #4d5741;
+  font: 700 15px/1.42 "Trebuchet MS", system-ui, sans-serif;
+}
+
+.intro-gate__button {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 22px 14px;
+  background: #c87538;
+  color: #fffaf5;
+  font: 800 17px/1 "Trebuchet MS", system-ui, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(200, 117, 56, 0.24);
+  transform: rotate(-1deg);
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.intro-gate__button:hover,
+.intro-gate__button:focus-visible {
+  background: #b76731;
+  box-shadow: 0 12px 28px rgba(200, 117, 56, 0.3);
+  transform: rotate(-1deg) translateY(-1px);
+}
+
+.intro-gate__button:focus-visible {
+  outline: 3px solid rgba(99, 115, 76, 0.45);
+  outline-offset: 4px;
+}
+
+.intro-gate[aria-hidden="true"] {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.story-is-gated .scroll-hint,
+.story-is-gated .journey-cue {
+  opacity: 0;
+}
+
 .story-spacer {
   position: absolute;
   inset: 0 auto auto 0;
@@ -212,6 +361,21 @@ body {
 
   .scroll-hint.is-hidden {
     transform: translateY(10px);
+  }
+
+  .journey-cue,
+  .journey-cue[data-position="top"],
+  .journey-cue[data-position="bottom"] {
+    left: auto;
+    right: 34px;
+    top: auto;
+    bottom: 28px;
+    min-width: 230px;
+    transform: translateY(8px);
+  }
+
+  .journey-cue.is-visible {
+    transform: translateY(0);
   }
 }
 

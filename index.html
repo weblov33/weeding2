@@ -48,6 +48,22 @@
             <span>листайте карту вниз</span>
             <i></i>
           </div>
+          <div class="journey-cue" data-position="bottom" aria-hidden="true">
+            <b>Маршрут приглашения</b>
+            <span>листайте дальше</span>
+          </div>
+          <div class="intro-gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+            <div class="intro-gate__panel">
+              <p>Официальное приглашение</p>
+              <h1 id="gate-title">Вас приглашают на свадьбу</h1>
+              <strong>Антон и Лизавета · 18 сентября</strong>
+              <span>
+                Откройте приглашение, а затем просто листайте вниз:
+                карта плавно проведет вас по дате, месту, таймингу и важным деталям.
+              </span>
+              <button class="intro-gate__button" type="button">Принять приглашение</button>
+            </div>
+          </div>
         </div>
         <div class="story-spacer" aria-hidden="true"></div>
       </section>
@@ -59,6 +75,8 @@
         {
           id: "overview",
           title: "Общий вид",
+          cue: "Сначала вся карта целиком",
+          cuePosition: "bottom",
           box: { x: 0, y: 0, width: 1080, height: 1920 },
           zoom: 1,
           fit: "contain",
@@ -66,66 +84,88 @@
         {
           id: "intro",
           title: "Приветствие",
+          cue: "листайте, чтобы пройти по приглашению",
+          cuePosition: "bottom",
           box: { x: 0, y: 95, width: 560, height: 380 },
           zoom: 1.02,
         },
         {
           id: "names",
-          title: "Имена",
+          title: "Антон и Лизавета",
+          cue: "дальше место и дата",
+          cuePosition: "bottom",
           box: { x: 705, y: 20, width: 350, height: 360 },
           zoom: 1.02,
         },
         {
           id: "place",
           title: "Место",
+          cue: "ниже отмечена дата",
+          cuePosition: "bottom",
           box: { x: 80, y: 315, width: 360, height: 165 },
           zoom: 1.04,
         },
         {
           id: "date",
-          title: "Дата",
+          title: "18 сентября",
+          cue: "листайте к таймингу",
+          cuePosition: "top",
           box: { x: 35, y: 545, width: 410, height: 360 },
           zoom: 1.02,
         },
         {
           id: "timing",
           title: "Тайминг",
+          cue: "дальше маленький личный блок",
+          cuePosition: "top",
           box: { x: 80, y: 835, width: 580, height: 310 },
           zoom: 1.01,
         },
         {
           id: "personal",
           title: "Личный блок",
+          cue: "следом дресс-код",
+          cuePosition: "top",
           box: { x: 560, y: 835, width: 360, height: 300 },
           zoom: 1.03,
         },
         {
           id: "dress",
           title: "Дресс-код",
+          cue: "листайте к пожеланиям",
+          cuePosition: "top",
           box: { x: 20, y: 1165, width: 610, height: 390 },
           zoom: 1,
         },
         {
           id: "gifts",
           title: "Подарки",
+          cue: "еще ниже про цветы",
+          cuePosition: "top",
           box: { x: 640, y: 1195, width: 400, height: 345 },
           zoom: 1.02,
         },
         {
           id: "flowers",
           title: "Цветы",
+          cue: "листайте до анкеты гостя",
+          cuePosition: "top",
           box: { x: 675, y: 1460, width: 385, height: 310 },
           zoom: 1.03,
         },
         {
           id: "form",
-          title: "Анкета",
+          title: "Анкета гостя",
+          cue: "здесь можно открыть анкету",
+          cuePosition: "top",
           box: { x: 180, y: 1565, width: 670, height: 270 },
           zoom: 1,
         },
         {
           id: "final",
-          title: "Финал",
+          title: "До встречи",
+          cue: "до встречи на празднике",
+          cuePosition: "top",
           box: { x: 135, y: 1735, width: 785, height: 170 },
           zoom: 1,
         },
@@ -136,21 +176,27 @@
       const camera = document.querySelector(".story-camera");
       const poster = document.querySelector(".poster-map");
       const scrollHint = document.querySelector(".scroll-hint");
+      const introGate = document.querySelector(".intro-gate");
+      const introButton = document.querySelector(".intro-gate__button");
+      const journeyCue = document.querySelector(".journey-cue");
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       let targetFrame;
       let paintedFrame;
       let animationFrame = 0;
+      let activeStepIndex = 0;
+      let hasEntered = false;
 
       if ("scrollRestoration" in history) {
         history.scrollRestoration = "manual";
       }
 
+      document.body.classList.add("story-is-gated");
       story.style.setProperty("--step-count", steps.length);
       spacer.innerHTML = steps.map(() => "<span></span>").join("");
 
       const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
       const mix = (from, to, progress) => from + (to - from) * progress;
-      const ease = (value) => value * value * (3 - 2 * value);
+      const easeInOutSine = (value) => 0.5 - Math.cos(Math.PI * value) / 2;
 
       const getViewportSize = () => ({
         width: Math.round(window.visualViewport?.width || window.innerWidth || camera.clientWidth),
@@ -200,24 +246,37 @@
         return distance > 0 ? clamp(-rect.top / distance, 0, 1) : 0;
       };
 
-      const getStoryFrame = (progress) => {
-        const raw = progress * steps.length;
+      const getScrollForStep = (stepIndex) => {
+        const distance = story.offsetHeight - getViewportSize().height;
+        const segmentCount = steps.length - 1;
+        return Math.max(0, distance * clamp(stepIndex / segmentCount, 0, 1));
+      };
+
+      const getStoryState = (progress) => {
+        const segmentCount = steps.length - 1;
+        const raw = progress * segmentCount;
         const index = Math.min(Math.floor(raw), steps.length - 1);
         const local = raw - index;
-        const holdEnd = 0.56;
+        const holdEnd = 0.72;
 
         if (index >= steps.length - 1 || local <= holdEnd) {
-          return getCameraForStep(steps[index]);
+          return {
+            frame: getCameraForStep(steps[index]),
+            activeIndex: index,
+          };
         }
 
-        const amount = ease((local - holdEnd) / (1 - holdEnd));
+        const amount = easeInOutSine((local - holdEnd) / (1 - holdEnd));
         const current = getCameraForStep(steps[index]);
         const next = getCameraForStep(steps[index + 1]);
 
         return {
-          scale: mix(current.scale, next.scale, amount),
-          x: mix(current.x, next.x, amount),
-          y: mix(current.y, next.y, amount),
+          frame: {
+            scale: mix(current.scale, next.scale, amount),
+            x: mix(current.x, next.x, amount),
+            y: mix(current.y, next.y, amount),
+          },
+          activeIndex: amount < 0.55 ? index : index + 1,
         };
       };
 
@@ -239,9 +298,9 @@
         }
 
         paintedFrame = {
-          x: mix(paintedFrame.x, targetFrame.x, 0.18),
-          y: mix(paintedFrame.y, targetFrame.y, 0.18),
-          scale: mix(paintedFrame.scale, targetFrame.scale, 0.18),
+          x: mix(paintedFrame.x, targetFrame.x, 0.22),
+          y: mix(paintedFrame.y, targetFrame.y, 0.22),
+          scale: mix(paintedFrame.scale, targetFrame.scale, 0.22),
         };
 
         const delta =
@@ -266,20 +325,46 @@
         }
       };
 
+      const updateCue = (index, progress) => {
+        activeStepIndex = index;
+        const step = steps[index];
+        journeyCue.dataset.position = step.cuePosition || "bottom";
+        journeyCue.querySelector("b").textContent = step.title;
+        journeyCue.querySelector("span").textContent = step.cue;
+
+        const shouldShowCue = hasEntered && progress > 0.04 && index < steps.length - 1;
+        journeyCue.classList.toggle("is-visible", shouldShowCue);
+        scrollHint.classList.toggle("is-hidden", hasEntered ? progress > 0.018 : false);
+      };
+
+      const enterStory = () => {
+        hasEntered = true;
+        document.body.classList.remove("story-is-gated");
+        document.body.classList.add("story-has-entered");
+        introGate.setAttribute("aria-hidden", "true");
+        introButton.disabled = true;
+
+        window.scrollTo({
+          top: getScrollForStep(1),
+          behavior: prefersReducedMotion ? "auto" : "smooth",
+        });
+      };
+
       const render = () => {
         syncViewportHeight();
 
         if (prefersReducedMotion) {
           targetFrame = getCameraForStep(steps[0]);
           paintedFrame = null;
+          updateCue(0, 0);
           draw();
           return;
         }
 
         const progress = getProgress();
-        targetFrame = getStoryFrame(progress);
-
-        scrollHint.classList.toggle("is-hidden", progress > 0.018);
+        const state = getStoryState(progress);
+        targetFrame = state.frame;
+        updateCue(state.activeIndex, progress);
 
         if (!paintedFrame) {
           draw();
@@ -288,6 +373,18 @@
 
         queueDraw();
       };
+
+      introButton.addEventListener("click", enterStory);
+      window.addEventListener(
+        "keydown",
+        (event) => {
+          if (!hasEntered && (event.key === "Enter" || event.key === " ")) {
+            event.preventDefault();
+            enterStory();
+          }
+        },
+        { passive: false },
+      );
 
       window.addEventListener("scroll", render, { passive: true });
       document.addEventListener("scroll", render, { passive: true });
@@ -298,13 +395,14 @@
       });
       window.visualViewport?.addEventListener("scroll", render, { passive: true });
       window.addEventListener("pageshow", () => {
-        if (!location.hash && window.scrollY < 2) {
+        if (!hasEntered || (!location.hash && window.scrollY < 2)) {
           window.scrollTo(0, 0);
         }
 
         paintedFrame = null;
         render();
       });
+      window.scrollTo(0, 0);
       render();
     </script>
   </body>
