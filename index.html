@@ -169,6 +169,15 @@
           box: { x: 135, y: 1735, width: 785, height: 170 },
           zoom: 1,
         },
+        {
+          id: "overviewEnd",
+          title: "Общий вид",
+          cue: "приглашение целиком",
+          cuePosition: "bottom",
+          box: { x: 0, y: 0, width: 1080, height: 1920 },
+          zoom: 1,
+          fit: "contain",
+        },
       ];
 
       const story = document.querySelector(".poster-story");
@@ -257,7 +266,7 @@
         const raw = progress * segmentCount;
         const index = Math.min(Math.floor(raw), steps.length - 1);
         const local = raw - index;
-        const holdEnd = 0.72;
+        const holdEnd = 0.46;
 
         if (index >= steps.length - 1 || local <= holdEnd) {
           return {
@@ -298,9 +307,9 @@
         }
 
         paintedFrame = {
-          x: mix(paintedFrame.x, targetFrame.x, 0.22),
-          y: mix(paintedFrame.y, targetFrame.y, 0.22),
-          scale: mix(paintedFrame.scale, targetFrame.scale, 0.22),
+          x: mix(paintedFrame.x, targetFrame.x, 0.12),
+          y: mix(paintedFrame.y, targetFrame.y, 0.12),
+          scale: mix(paintedFrame.scale, targetFrame.scale, 0.12),
         };
 
         const delta =
@@ -308,13 +317,13 @@
           Math.abs(paintedFrame.y - targetFrame.y) +
           Math.abs(paintedFrame.scale - targetFrame.scale) * 1000;
 
-        if (delta < 0.5) {
+        if (delta < 0.28) {
           paintedFrame = { ...targetFrame };
         }
 
         applyFrame(paintedFrame);
 
-        if (delta >= 0.5) {
+        if (delta >= 0.28) {
           animationFrame = window.requestAnimationFrame(draw);
         }
       };

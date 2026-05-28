@@ -33,7 +33,7 @@ body.story-is-gated {
 .poster-story {
   --step-count: 12;
   position: relative;
-  min-height: calc((var(--step-count) + 0.72) * var(--viewport-height));
+  min-height: calc((var(--step-count) + 4.5) * var(--viewport-height));
   background: var(--paper-bg);
 }
 
