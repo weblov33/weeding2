@@ -45,7 +45,7 @@
             ></a>
           </div>
           <div class="scroll-hint" aria-hidden="true">
-            <span>листайте вниз</span>
+            <span>листайте карту вниз</span>
             <i></i>
           </div>
         </div>
@@ -66,68 +66,68 @@
         {
           id: "intro",
           title: "Приветствие",
-          box: { x: 35, y: 170, width: 500, height: 230 },
-          zoom: 1.08,
+          box: { x: 0, y: 95, width: 560, height: 380 },
+          zoom: 1.02,
         },
         {
           id: "names",
           title: "Имена",
-          box: { x: 760, y: 70, width: 275, height: 300 },
-          zoom: 1.08,
-        },
-        {
-          id: "date",
-          title: "Дата",
-          box: { x: 55, y: 610, width: 535, height: 335 },
-          zoom: 1.04,
+          box: { x: 705, y: 20, width: 350, height: 360 },
+          zoom: 1.02,
         },
         {
           id: "place",
           title: "Место",
-          box: { x: 145, y: 345, width: 355, height: 165 },
-          zoom: 1.1,
+          box: { x: 80, y: 315, width: 360, height: 165 },
+          zoom: 1.04,
+        },
+        {
+          id: "date",
+          title: "Дата",
+          box: { x: 35, y: 545, width: 410, height: 360 },
+          zoom: 1.02,
         },
         {
           id: "timing",
           title: "Тайминг",
-          box: { x: 155, y: 900, width: 650, height: 300 },
-          zoom: 1.02,
+          box: { x: 80, y: 835, width: 580, height: 310 },
+          zoom: 1.01,
         },
         {
           id: "personal",
           title: "Личный блок",
-          box: { x: 610, y: 870, width: 340, height: 295 },
-          zoom: 1.08,
+          box: { x: 560, y: 835, width: 360, height: 300 },
+          zoom: 1.03,
         },
         {
           id: "dress",
           title: "Дресс-код",
-          box: { x: 40, y: 1160, width: 650, height: 430 },
-          zoom: 1.03,
+          box: { x: 20, y: 1165, width: 610, height: 390 },
+          zoom: 1,
         },
         {
           id: "gifts",
           title: "Подарки",
-          box: { x: 665, y: 1160, width: 360, height: 360 },
-          zoom: 1.08,
+          box: { x: 640, y: 1195, width: 400, height: 345 },
+          zoom: 1.02,
         },
         {
           id: "flowers",
           title: "Цветы",
-          box: { x: 735, y: 1450, width: 315, height: 300 },
-          zoom: 1.12,
+          box: { x: 675, y: 1460, width: 385, height: 310 },
+          zoom: 1.03,
         },
         {
           id: "form",
           title: "Анкета",
-          box: { x: 155, y: 1540, width: 760, height: 330 },
-          zoom: 1.02,
+          box: { x: 180, y: 1565, width: 670, height: 270 },
+          zoom: 1,
         },
         {
           id: "final",
           title: "Финал",
-          box: { x: 240, y: 1760, width: 600, height: 155 },
-          zoom: 1.18,
+          box: { x: 135, y: 1735, width: 785, height: 170 },
+          zoom: 1,
         },
       ];
 
@@ -137,6 +137,13 @@
       const poster = document.querySelector(".poster-map");
       const scrollHint = document.querySelector(".scroll-hint");
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let targetFrame;
+      let paintedFrame;
+      let animationFrame = 0;
+
+      if ("scrollRestoration" in history) {
+        history.scrollRestoration = "manual";
+      }
 
       story.style.setProperty("--step-count", steps.length);
       spacer.innerHTML = steps.map(() => "<span></span>").join("");
@@ -145,9 +152,17 @@
       const mix = (from, to, progress) => from + (to - from) * progress;
       const ease = (value) => value * value * (3 - 2 * value);
 
+      const getViewportSize = () => ({
+        width: Math.round(window.visualViewport?.width || window.innerWidth || camera.clientWidth),
+        height: Math.round(window.visualViewport?.height || window.innerHeight || camera.clientHeight),
+      });
+
+      const syncViewportHeight = () => {
+        document.documentElement.style.setProperty("--viewport-height", `${getViewportSize().height}px`);
+      };
+
       const getCameraForStep = (step) => {
-        const viewportWidth = camera.clientWidth;
-        const viewportHeight = camera.clientHeight;
+        const { width: viewportWidth, height: viewportHeight } = getViewportSize();
 
         if (step.fit === "contain") {
           const scale = Math.min(viewportWidth / POSTER.width, viewportHeight / POSTER.height);
@@ -159,11 +174,12 @@
           };
         }
 
-        const safeWidth = viewportWidth - Math.min(72, viewportWidth * 0.12);
-        const safeHeight = viewportHeight - Math.min(96, viewportHeight * 0.12);
+        const safeWidth = viewportWidth - Math.min(52, viewportWidth * 0.1);
+        const safeHeight = viewportHeight - Math.min(72, viewportHeight * 0.1);
         const coverScale = Math.max(viewportWidth / POSTER.width, viewportHeight / POSTER.height);
         const boxScale = Math.min(safeWidth / step.box.width, safeHeight / step.box.height) * step.zoom;
-        const scale = Math.max(coverScale, boxScale);
+        const maxScale = viewportWidth >= 900 ? 1.64 : viewportWidth >= 640 ? 1.34 : 1.08;
+        const scale = Math.max(coverScale, Math.min(boxScale, maxScale));
         const scaledWidth = POSTER.width * scale;
         const scaledHeight = POSTER.height * scale;
         const boxCenterX = (step.box.x + step.box.width / 2) * scale;
@@ -180,39 +196,115 @@
 
       const getProgress = () => {
         const rect = story.getBoundingClientRect();
-        const distance = story.offsetHeight - window.innerHeight;
+        const distance = story.offsetHeight - getViewportSize().height;
         return distance > 0 ? clamp(-rect.top / distance, 0, 1) : 0;
       };
 
-      const render = () => {
-        if (prefersReducedMotion) {
-          const scale = Math.min(window.innerWidth / POSTER.width, window.innerHeight / POSTER.height);
-          const x = (window.innerWidth - POSTER.width * scale) / 2;
-          poster.style.transform = `translate3d(${x}px, 0, 0) scale(${scale})`;
-          return;
+      const getStoryFrame = (progress) => {
+        const raw = progress * steps.length;
+        const index = Math.min(Math.floor(raw), steps.length - 1);
+        const local = raw - index;
+        const holdEnd = 0.56;
+
+        if (index >= steps.length - 1 || local <= holdEnd) {
+          return getCameraForStep(steps[index]);
         }
 
-        const progress = getProgress();
-        const position = progress * (steps.length - 1);
-        const index = Math.min(Math.floor(position), steps.length - 2);
-        const amount = ease(position - index);
+        const amount = ease((local - holdEnd) / (1 - holdEnd));
         const current = getCameraForStep(steps[index]);
         const next = getCameraForStep(steps[index + 1]);
-        const transform = {
+
+        return {
           scale: mix(current.scale, next.scale, amount),
           x: mix(current.x, next.x, amount),
           y: mix(current.y, next.y, amount),
         };
+      };
 
-        poster.style.transform = `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${transform.scale})`;
-        scrollHint.classList.toggle("is-hidden", progress > 0.04);
+      const applyFrame = (frame) => {
+        poster.style.transform = `translate3d(${frame.x}px, ${frame.y}px, 0) scale(${frame.scale})`;
+      };
+
+      const draw = () => {
+        animationFrame = 0;
+
+        if (!targetFrame) {
+          return;
+        }
+
+        if (!paintedFrame || prefersReducedMotion) {
+          paintedFrame = { ...targetFrame };
+          applyFrame(paintedFrame);
+          return;
+        }
+
+        paintedFrame = {
+          x: mix(paintedFrame.x, targetFrame.x, 0.18),
+          y: mix(paintedFrame.y, targetFrame.y, 0.18),
+          scale: mix(paintedFrame.scale, targetFrame.scale, 0.18),
+        };
+
+        const delta =
+          Math.abs(paintedFrame.x - targetFrame.x) +
+          Math.abs(paintedFrame.y - targetFrame.y) +
+          Math.abs(paintedFrame.scale - targetFrame.scale) * 1000;
+
+        if (delta < 0.5) {
+          paintedFrame = { ...targetFrame };
+        }
+
+        applyFrame(paintedFrame);
+
+        if (delta >= 0.5) {
+          animationFrame = window.requestAnimationFrame(draw);
+        }
+      };
+
+      const queueDraw = () => {
+        if (!animationFrame) {
+          animationFrame = window.requestAnimationFrame(draw);
+        }
+      };
+
+      const render = () => {
+        syncViewportHeight();
+
+        if (prefersReducedMotion) {
+          targetFrame = getCameraForStep(steps[0]);
+          paintedFrame = null;
+          draw();
+          return;
+        }
+
+        const progress = getProgress();
+        targetFrame = getStoryFrame(progress);
+
+        scrollHint.classList.toggle("is-hidden", progress > 0.018);
+
+        if (!paintedFrame) {
+          draw();
+          return;
+        }
+
+        queueDraw();
       };
 
       window.addEventListener("scroll", render, { passive: true });
       document.addEventListener("scroll", render, { passive: true });
       window.addEventListener("resize", render);
-      window.visualViewport?.addEventListener("resize", render);
-      window.setInterval(render, 120);
+      window.visualViewport?.addEventListener("resize", () => {
+        paintedFrame = null;
+        render();
+      });
+      window.visualViewport?.addEventListener("scroll", render, { passive: true });
+      window.addEventListener("pageshow", () => {
+        if (!location.hash && window.scrollY < 2) {
+          window.scrollTo(0, 0);
+        }
+
+        paintedFrame = null;
+        render();
+      });
       render();
     </script>
   </body>

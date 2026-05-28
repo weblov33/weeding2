@@ -1,6 +1,7 @@
 :root {
   --paper-bg: #f5f1f5;
   --focus: #c87538;
+  --viewport-height: 100svh;
 }
 
 * {
@@ -10,12 +11,14 @@
 html,
 body {
   min-height: 100%;
+  background: var(--paper-bg);
 }
 
 body {
   margin: 0;
   overflow-x: hidden;
   background: var(--paper-bg);
+  overscroll-behavior-x: none;
 }
 
 .story-shell {
@@ -26,16 +29,16 @@ body {
 .poster-story {
   --step-count: 12;
   position: relative;
-  min-height: calc(var(--step-count) * 100dvh);
+  min-height: calc((var(--step-count) + 0.72) * var(--viewport-height));
   background: var(--paper-bg);
 }
 
 .story-camera {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
+  height: var(--viewport-height);
   overflow: hidden;
   background: var(--paper-bg);
   contain: layout paint;
@@ -45,11 +48,11 @@ body {
 .story-camera::before {
   content: "";
   position: absolute;
-  inset: -26px;
+  inset: -34px;
   z-index: 0;
   background: url("assets/invitation.png") center / cover no-repeat;
-  filter: blur(16px) saturate(0.92);
-  opacity: 0.32;
+  filter: blur(18px) saturate(0.92);
+  opacity: 0.42;
   transform: scale(1.05);
 }
 
@@ -74,6 +77,7 @@ body {
   transform-origin: 0 0;
   backface-visibility: hidden;
   will-change: transform;
+  filter: drop-shadow(0 18px 38px rgba(78, 59, 78, 0.08));
 }
 
 .poster-image {
@@ -126,20 +130,32 @@ body {
 .scroll-hint {
   position: absolute;
   left: 50%;
-  bottom: max(18px, env(safe-area-inset-bottom));
+  bottom: max(20px, calc(env(safe-area-inset-bottom) + 14px));
   z-index: 20;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 14px 10px;
+  gap: 9px;
+  padding: 10px 16px 11px;
   border-radius: 999px;
-  background: rgba(245, 241, 245, 0.72);
+  background: rgba(255, 255, 255, 0.76);
   color: #63734c;
-  font: 700 15px/1 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 28px rgba(80, 65, 80, 0.08);
+  font: 700 16px/1.05 "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+  letter-spacing: 0;
+  pointer-events: none;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 12px 32px rgba(80, 65, 80, 0.1);
   transform: translateX(-50%);
   transition: opacity 280ms ease, transform 280ms ease;
+}
+
+.scroll-hint::before {
+  content: "";
+  position: absolute;
+  inset: -7px -9px;
+  z-index: -1;
+  border: 2px solid rgba(200, 117, 56, 0.22);
+  border-radius: 999px 999px 999px 80%;
+  transform: rotate(-1.5deg);
 }
 
 .scroll-hint span {
@@ -170,7 +186,7 @@ body {
 
 .story-spacer span {
   display: block;
-  height: 100dvh;
+  height: var(--viewport-height);
 }
 
 @keyframes hint-bounce {
@@ -186,9 +202,22 @@ body {
   }
 }
 
+@media (min-width: 900px) and (min-aspect-ratio: 1 / 1) {
+  .scroll-hint {
+    left: auto;
+    right: 34px;
+    bottom: 28px;
+    transform: none;
+  }
+
+  .scroll-hint.is-hidden {
+    transform: translateY(10px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .poster-story {
-    min-height: 100dvh;
+    min-height: var(--viewport-height);
   }
 
   .scroll-hint i {
