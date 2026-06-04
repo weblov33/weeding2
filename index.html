@@ -183,22 +183,10 @@
           cuePosition: "top",
           buttonPosition: "top",
           motion: "grand",
-          box: { x: 245, y: 1625, width: 610, height: 215 },
+          box: { x: 315, y: 1620, width: 445, height: 230 },
           zoom: 1,
-          maxScale: 0.6,
-          nudge: { y: 0.06 },
-        },
-        {
-          id: "final",
-          title: "До встречи",
-          cue: "до встречи на празднике",
-          cuePosition: "top",
-          buttonPosition: "top",
-          motion: "settle",
-          box: { x: 205, y: 1790, width: 675, height: 115 },
-          zoom: 1,
-          maxScale: 0.56,
-          nudge: { y: 0.08 },
+          maxScale: 0.68,
+          nudge: { y: 0.02 },
         },
         {
           id: "overviewEnd",
@@ -276,7 +264,8 @@
           };
         }
 
-        const safeWidth = viewportWidth - Math.min(52, viewportWidth * 0.1);
+        const controlReserve = viewportWidth >= 900 ? 132 : viewportWidth >= 640 ? 108 : 78;
+        const safeWidth = viewportWidth - controlReserve - Math.min(52, viewportWidth * 0.1);
         const safeHeight = viewportHeight - Math.min(72, viewportHeight * 0.1);
         const boxScale = Math.min(safeWidth / step.box.width, safeHeight / step.box.height) * step.zoom;
         const defaultMaxScale = viewportWidth >= 900 ? 1.5 : viewportWidth >= 640 ? 1.34 : 1.24;
@@ -290,12 +279,13 @@
         const minY = Math.min(0, viewportHeight - scaledHeight);
         const maxX = Math.max(0, viewportWidth - scaledWidth);
         const maxY = Math.max(0, viewportHeight - scaledHeight);
+        const safeCenterX = (viewportWidth - controlReserve) / 2;
         const nudgeX = (step.nudge?.x || 0) * viewportWidth;
         const nudgeY = (step.nudge?.y || 0) * viewportHeight;
 
         return {
           scale,
-          x: clamp(viewportWidth / 2 - boxCenterX + nudgeX, minX, maxX),
+          x: clamp(safeCenterX - boxCenterX + nudgeX, minX, maxX),
           y: clamp(viewportHeight / 2 - boxCenterY + nudgeY, minY, maxY),
         };
       };
