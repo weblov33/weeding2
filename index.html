@@ -93,15 +93,27 @@
           fit: "contain",
         },
         {
-          id: "introPlace",
-          title: "Приветствие и место",
+          id: "intro",
+          title: "Приветствие",
           cue: "начало приглашения",
           cuePosition: "bottom",
           buttonPosition: "bottom",
           motion: "settle",
-          box: { x: 35, y: 115, width: 430, height: 365 },
+          box: { x: 35, y: 135, width: 430, height: 180 },
           zoom: 1,
-          maxScale: 0.86,
+          maxScale: 0.7,
+          nudge: { y: -0.08 },
+        },
+        {
+          id: "place",
+          title: "Место",
+          cue: "Lake View Villa",
+          cuePosition: "bottom",
+          buttonPosition: "bottom",
+          motion: "float",
+          box: { x: 115, y: 305, width: 365, height: 180 },
+          zoom: 1,
+          maxScale: 0.78,
           nudge: { y: -0.08 },
         },
         {
@@ -111,9 +123,9 @@
           cuePosition: "bottom",
           buttonPosition: "bottom",
           motion: "arc",
-          box: { x: 480, y: 25, width: 580, height: 505 },
+          box: { x: 725, y: 35, width: 330, height: 315 },
           zoom: 1,
-          maxScale: 0.66,
+          maxScale: 0.9,
           nudge: { y: -0.02 },
         },
         {
@@ -123,10 +135,10 @@
           cuePosition: "top",
           buttonPosition: "bottom",
           motion: "float",
-          box: { x: 65, y: 535, width: 395, height: 310 },
+          box: { x: 65, y: 535, width: 395, height: 300 },
           zoom: 1,
-          maxScale: 0.92,
-          nudge: { y: -0.04 },
+          maxScale: 0.82,
+          nudge: { y: -0.02 },
         },
         {
           id: "timing",
@@ -135,9 +147,9 @@
           cuePosition: "top",
           buttonPosition: "top",
           motion: "arc",
-          box: { x: 205, y: 880, width: 420, height: 245 },
+          box: { x: 205, y: 890, width: 420, height: 230 },
           zoom: 1,
-          maxScale: 0.86,
+          maxScale: 0.82,
           nudge: { y: 0.04 },
         },
         {
@@ -159,7 +171,7 @@
           cuePosition: "top",
           buttonPosition: "top",
           motion: "float",
-          box: { x: 65, y: 1085, width: 540, height: 520 },
+          box: { x: 65, y: 1085, width: 540, height: 500 },
           zoom: 1,
           maxScale: 0.62,
           nudge: { y: 0.02 },
@@ -171,9 +183,9 @@
           cuePosition: "top",
           buttonPosition: "top",
           motion: "arc",
-          box: { x: 690, y: 1225, width: 365, height: 570 },
+          box: { x: 690, y: 1240, width: 365, height: 545 },
           zoom: 1,
-          maxScale: 0.86,
+          maxScale: 0.78,
           nudge: { y: 0.06 },
         },
         {
@@ -264,7 +276,7 @@
           };
         }
 
-        const controlReserve = viewportWidth >= 900 ? 132 : viewportWidth >= 640 ? 108 : 78;
+        const controlReserve = viewportWidth >= 900 ? 128 : viewportWidth >= 640 ? 104 : 86;
         const safeWidth = viewportWidth - controlReserve - Math.min(52, viewportWidth * 0.1);
         const safeHeight = viewportHeight - Math.min(72, viewportHeight * 0.1);
         const boxScale = Math.min(safeWidth / step.box.width, safeHeight / step.box.height) * step.zoom;
