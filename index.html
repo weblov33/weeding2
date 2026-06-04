@@ -95,22 +95,24 @@
         {
           id: "intro",
           title: "Приветствие",
-          cue: "чтобы продолжить, нажмите кнопку",
+          cue: "начнем с главного",
           cuePosition: "bottom",
           buttonPosition: "bottom",
           motion: "float",
-          box: { x: 0, y: 100, width: 620, height: 360 },
-          zoom: 1,
+          box: { x: 55, y: 145, width: 355, height: 165 },
+          zoom: 1.2,
+          nudge: { y: -0.08 },
         },
         {
           id: "names",
           title: "Антон и Лизавета",
-          cue: "дальше место и дата",
+          cue: "знакомимся с героями дня",
           cuePosition: "bottom",
           buttonPosition: "bottom",
           motion: "arc",
-          box: { x: 690, y: 20, width: 385, height: 350 },
-          zoom: 1,
+          box: { x: 720, y: 30, width: 335, height: 310 },
+          zoom: 1.1,
+          nudge: { y: -0.06 },
         },
         {
           id: "place",
@@ -119,8 +121,9 @@
           cuePosition: "bottom",
           buttonPosition: "bottom",
           motion: "settle",
-          box: { x: 70, y: 300, width: 490, height: 235 },
-          zoom: 1,
+          box: { x: 145, y: 340, width: 300, height: 135 },
+          zoom: 1.28,
+          nudge: { y: -0.1 },
         },
         {
           id: "date",
@@ -129,28 +132,31 @@
           cuePosition: "top",
           buttonPosition: "bottom",
           motion: "float",
-          box: { x: 35, y: 545, width: 475, height: 390 },
-          zoom: 1,
+          box: { x: 70, y: 555, width: 370, height: 270 },
+          zoom: 1.15,
+          nudge: { y: -0.08 },
         },
         {
           id: "timing",
           title: "Тайминг",
           cue: "дальше маленький личный блок",
           cuePosition: "top",
-          buttonPosition: "bottom",
+          buttonPosition: "top",
           motion: "arc",
-          box: { x: 70, y: 840, width: 620, height: 320 },
-          zoom: 1,
+          box: { x: 220, y: 920, width: 380, height: 185 },
+          zoom: 1.24,
+          nudge: { y: 0.08 },
         },
         {
           id: "personal",
           title: "Личный блок",
           cue: "следом дресс-код",
           cuePosition: "top",
-          buttonPosition: "bottom",
+          buttonPosition: "top",
           motion: "settle",
-          box: { x: 550, y: 820, width: 410, height: 335 },
-          zoom: 1,
+          box: { x: 585, y: 905, width: 275, height: 275 },
+          zoom: 1.18,
+          nudge: { y: 0.1 },
         },
         {
           id: "dress",
@@ -159,8 +165,9 @@
           cuePosition: "top",
           buttonPosition: "top",
           motion: "float",
-          box: { x: 15, y: 1140, width: 650, height: 440 },
-          zoom: 1,
+          box: { x: 250, y: 1245, width: 350, height: 330 },
+          zoom: 1.08,
+          nudge: { y: 0.06 },
         },
         {
           id: "gifts",
@@ -169,8 +176,9 @@
           cuePosition: "top",
           buttonPosition: "top",
           motion: "arc",
-          box: { x: 620, y: 1180, width: 440, height: 385 },
-          zoom: 1,
+          box: { x: 705, y: 1260, width: 330, height: 280 },
+          zoom: 1.16,
+          nudge: { y: 0.08 },
         },
         {
           id: "flowers",
@@ -179,8 +187,9 @@
           cuePosition: "top",
           buttonPosition: "top",
           motion: "settle",
-          box: { x: 650, y: 1425, width: 420, height: 370 },
-          zoom: 1,
+          box: { x: 775, y: 1545, width: 280, height: 245 },
+          zoom: 1.18,
+          nudge: { y: 0.1 },
         },
         {
           id: "form",
@@ -189,8 +198,10 @@
           cuePosition: "top",
           buttonPosition: "top",
           motion: "grand",
-          box: { x: 120, y: 1540, width: 830, height: 300 },
-          zoom: 1,
+          box: { x: 300, y: 1660, width: 520, height: 170 },
+          zoom: 1.1,
+          minScale: 0.9,
+          nudge: { y: 0.12 },
         },
         {
           id: "final",
@@ -199,8 +210,10 @@
           cuePosition: "top",
           buttonPosition: "top",
           motion: "settle",
-          box: { x: 110, y: 1705, width: 850, height: 210 },
-          zoom: 1,
+          box: { x: 210, y: 1780, width: 600, height: 115 },
+          zoom: 1.18,
+          minScale: 0.9,
+          nudge: { y: 0.12 },
         },
         {
           id: "overviewEnd",
@@ -282,19 +295,21 @@
         const safeHeight = viewportHeight - Math.min(72, viewportHeight * 0.1);
         const coverScale = Math.max(viewportWidth / POSTER.width, viewportHeight / POSTER.height);
         const boxScale = Math.min(safeWidth / step.box.width, safeHeight / step.box.height) * step.zoom;
-        const maxScale = viewportWidth >= 900 ? 1.36 : viewportWidth >= 640 ? 1.22 : 1.08;
-        const scale = Math.max(coverScale, Math.min(boxScale, maxScale));
+        const maxScale = viewportWidth >= 900 ? 1.5 : viewportWidth >= 640 ? 1.34 : 1.24;
+        const scale = Math.max(coverScale, step.minScale || 0, Math.min(boxScale, maxScale));
         const scaledWidth = POSTER.width * scale;
         const scaledHeight = POSTER.height * scale;
         const boxCenterX = (step.box.x + step.box.width / 2) * scale;
         const boxCenterY = (step.box.y + step.box.height / 2) * scale;
         const minX = Math.min(0, viewportWidth - scaledWidth);
         const minY = Math.min(0, viewportHeight - scaledHeight);
+        const nudgeX = (step.nudge?.x || 0) * viewportWidth;
+        const nudgeY = (step.nudge?.y || 0) * viewportHeight;
 
         return {
           scale,
-          x: clamp(viewportWidth / 2 - boxCenterX, minX, 0),
-          y: clamp(viewportHeight / 2 - boxCenterY, minY, 0),
+          x: clamp(viewportWidth / 2 - boxCenterX + nudgeX, minX, 0),
+          y: clamp(viewportHeight / 2 - boxCenterY + nudgeY, minY, 0),
         };
       };
 
