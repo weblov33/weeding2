@@ -155,31 +155,33 @@ body.story-is-gated {
 
 .step-control {
   position: absolute;
-  top: 50%;
-  right: max(8px, env(safe-area-inset-right));
-  bottom: auto;
-  left: auto;
+  left: 50%;
+  right: auto;
+  bottom: max(16px, calc(env(safe-area-inset-bottom) + 12px));
+  top: auto;
   z-index: 24;
   display: grid;
-  grid-template-columns: 1fr;
-  grid-template-areas: "label";
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "label icon";
   place-items: center;
+  align-items: center;
+  column-gap: 9px;
   min-width: 0;
-  width: 86px;
+  width: min(188px, calc(100vw - 32px));
   min-height: 50px;
-  padding: 10px 9px 11px 12px;
-  border: 1px solid rgba(149, 76, 28, 0.22);
-  border-radius: 24px 0 0 24px;
+  padding: 11px 14px 12px 18px;
+  border: 1px solid rgba(99, 115, 76, 0.28);
+  border-radius: 999px;
   background:
-    radial-gradient(circle at 18% 20%, rgba(255, 244, 202, 0.38), transparent 34%),
-    linear-gradient(135deg, #d98345, #b8622e);
+    radial-gradient(circle at 18% 24%, rgba(224, 236, 210, 0.86), transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(246, 241, 248, 0.84));
   color: #222;
   opacity: 0;
   pointer-events: none;
   cursor: pointer;
   backdrop-filter: blur(16px);
-  box-shadow: 0 18px 38px rgba(116, 62, 31, 0.28);
-  transform: translateY(-50%) translateX(10px);
+  box-shadow: 0 16px 36px rgba(78, 59, 78, 0.14);
+  transform: translateX(-50%) translateY(12px) rotate(-0.7deg);
   transition:
     opacity 260ms ease,
     transform 260ms ease,
@@ -190,29 +192,27 @@ body.story-is-gated {
 .step-control::before {
   content: "";
   position: absolute;
-  inset: -7px 0 -7px -7px;
+  inset: -7px -9px;
   z-index: -1;
-  border: 2px solid rgba(200, 117, 56, 0.24);
-  border-right: 0;
-  border-radius: 29px 0 0 29px;
+  border: 2px solid rgba(200, 117, 56, 0.2);
+  border-radius: 999px 999px 999px 38px;
+  transform: rotate(1.4deg);
 }
 
 .step-control::after {
-  content: "";
+  content: "♡";
   position: absolute;
-  right: 9px;
-  top: 50%;
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid #fffaf5;
-  border-bottom: 2px solid #fffaf5;
-  transform: translateY(-50%) rotate(-45deg);
+  right: 16px;
+  top: -11px;
+  color: #c87538;
+  font: 900 18px/1 "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+  transform: rotate(12deg);
 }
 
 .step-control.is-visible {
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(-50%) translateX(0);
+  transform: translateX(-50%) translateY(0) rotate(-0.7deg);
   animation: next-pulse 2.8s ease-in-out infinite;
 }
 
@@ -222,27 +222,28 @@ body.story-is-gated {
 }
 
 .step-control[data-position="top"] {
-  top: 50%;
-  transform: translateY(-50%) translateX(10px);
+  bottom: max(16px, calc(env(safe-area-inset-bottom) + 12px));
+  top: auto;
+  transform: translateX(-50%) translateY(12px) rotate(-0.7deg);
 }
 
 .step-control[data-position="top"].is-visible {
-  top: 50%;
-  transform: translateY(-50%) translateX(0);
+  top: auto;
+  transform: translateX(-50%) translateY(0) rotate(-0.7deg);
 }
 
 .step-control:hover:not(:disabled),
 .step-control:focus-visible:not(:disabled) {
   background:
-    radial-gradient(circle at 18% 20%, rgba(255, 244, 202, 0.45), transparent 34%),
-    linear-gradient(135deg, #e08a4b, #ad5729);
-  box-shadow: 0 20px 42px rgba(116, 62, 31, 0.34);
-  transform: translateY(-50%) translateX(-2px);
+    radial-gradient(circle at 18% 24%, rgba(224, 236, 210, 0.96), transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 249, 244, 0.9));
+  box-shadow: 0 18px 40px rgba(78, 59, 78, 0.2);
+  transform: translateX(-50%) translateY(-2px) rotate(-0.7deg);
 }
 
 .step-control[data-position="top"]:hover:not(:disabled),
 .step-control[data-position="top"]:focus-visible:not(:disabled) {
-  transform: translateY(-50%) translateX(-2px);
+  transform: translateX(-50%) translateY(-2px) rotate(-0.7deg);
 }
 
 .step-control:focus-visible {
@@ -260,18 +261,18 @@ body.story-is-gated {
 
 .step-control b {
   grid-area: label;
-  color: #fffaf5;
-  font: 900 14px/1 "Trebuchet MS", system-ui, sans-serif;
+  color: #63734c;
+  font: 900 19px/1 "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
   letter-spacing: 0;
-  padding-right: 12px;
+  padding-right: 0;
   white-space: nowrap;
 }
 
 .step-control i {
-  display: none;
+  display: block;
   grid-area: icon;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border: 2px solid rgba(200, 117, 56, 0.34);
   border-radius: 50%;
   position: relative;
@@ -280,12 +281,12 @@ body.story-is-gated {
 .step-control i::before {
   content: "";
   position: absolute;
-  left: 7px;
-  top: 6px;
-  width: 7px;
-  height: 7px;
-  border-right: 2px solid #c87538;
-  border-bottom: 2px solid #c87538;
+  left: 8px;
+  top: 7px;
+  width: 8px;
+  height: 8px;
+  border-right: 2.5px solid #c87538;
+  border-bottom: 2.5px solid #c87538;
   transform: rotate(-45deg);
 }
 
@@ -575,11 +576,11 @@ body.story-is-gated {
 @keyframes next-pulse {
   0%,
   100% {
-    box-shadow: 0 18px 38px rgba(116, 62, 31, 0.28);
+    box-shadow: 0 16px 36px rgba(78, 59, 78, 0.14);
   }
 
   50% {
-    box-shadow: 0 20px 44px rgba(200, 117, 56, 0.42);
+    box-shadow: 0 18px 42px rgba(200, 117, 56, 0.24);
   }
 }
 
@@ -613,31 +614,31 @@ body.story-is-gated {
   .step-control,
   .step-control[data-position="bottom"],
   .step-control[data-position="top"] {
-    left: auto;
-    right: 18px;
-    top: 50%;
-    bottom: auto;
-    width: 92px;
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: 28px;
+    width: 188px;
     min-width: 0;
-    transform: translateY(-50%) translateX(10px);
+    transform: translateX(-50%) translateY(12px) rotate(-0.7deg);
   }
 
   .step-control.is-visible,
   .step-control[data-position="bottom"].is-visible,
   .step-control[data-position="top"].is-visible {
-    transform: translateY(-50%) translateX(0);
+    transform: translateX(-50%) translateY(0) rotate(-0.7deg);
   }
 
   .step-control:hover:not(:disabled),
   .step-control:focus-visible:not(:disabled),
   .step-control[data-position="bottom"]:hover:not(:disabled),
   .step-control[data-position="bottom"]:focus-visible:not(:disabled) {
-    transform: translateY(-50%) translateX(-2px);
+    transform: translateX(-50%) translateY(-2px) rotate(-0.7deg);
   }
 
   .step-control[data-position="top"]:hover:not(:disabled),
   .step-control[data-position="top"]:focus-visible:not(:disabled) {
-    transform: translateY(-50%) translateX(-2px);
+    transform: translateX(-50%) translateY(-2px) rotate(-0.7deg);
   }
 }
 

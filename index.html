@@ -93,39 +93,27 @@
           fit: "contain",
         },
         {
-          id: "intro",
-          title: "Приветствие",
+          id: "topLeft",
+          title: "Приветствие и место",
           cue: "начало приглашения",
           cuePosition: "bottom",
           buttonPosition: "bottom",
           motion: "settle",
-          box: { x: 35, y: 135, width: 430, height: 180 },
+          box: { x: 35, y: 130, width: 430, height: 350 },
           zoom: 1,
-          maxScale: 0.7,
-          nudge: { y: -0.08 },
+          maxScale: 0.72,
+          nudge: { y: -0.05 },
         },
         {
-          id: "place",
-          title: "Место",
-          cue: "Lake View Villa",
-          cuePosition: "bottom",
-          buttonPosition: "bottom",
-          motion: "float",
-          box: { x: 115, y: 305, width: 365, height: 180 },
-          zoom: 1,
-          maxScale: 0.78,
-          nudge: { y: -0.08 },
-        },
-        {
-          id: "names",
-          title: "Антон и Лизавета",
-          cue: "верхняя правая часть",
-          cuePosition: "bottom",
+          id: "namesCouple",
+          title: "Имена и герои",
+          cue: "Антон, Лизавета и гости",
+          cuePosition: "top",
           buttonPosition: "bottom",
           motion: "arc",
-          box: { x: 725, y: 35, width: 330, height: 315 },
+          box: { x: 455, y: 35, width: 600, height: 520 },
           zoom: 1,
-          maxScale: 0.9,
+          maxScale: 0.54,
           nudge: { y: -0.02 },
         },
         {
@@ -135,70 +123,70 @@
           cuePosition: "top",
           buttonPosition: "bottom",
           motion: "float",
-          box: { x: 65, y: 535, width: 395, height: 300 },
+          box: { x: 65, y: 535, width: 390, height: 295 },
           zoom: 1,
-          maxScale: 0.82,
-          nudge: { y: -0.02 },
+          maxScale: 0.78,
+          nudge: { y: 0.02 },
         },
         {
           id: "timing",
-          title: "Тайминг",
-          cue: "сбор гостей и начало",
+          title: "Тайминг и личный блок",
+          cue: "середина приглашения",
           cuePosition: "top",
           buttonPosition: "top",
           motion: "arc",
-          box: { x: 205, y: 890, width: 420, height: 230 },
+          box: { x: 205, y: 875, width: 675, height: 345 },
           zoom: 1,
-          maxScale: 0.82,
-          nudge: { y: 0.04 },
-        },
-        {
-          id: "personal",
-          title: "Личный блок",
-          cue: "маленькая пауза по пути",
-          cuePosition: "top",
-          buttonPosition: "top",
-          motion: "settle",
-          box: { x: 575, y: 890, width: 300, height: 305 },
-          zoom: 1,
-          maxScale: 1.04,
-          nudge: { y: 0.06 },
+          maxScale: 0.48,
+          nudge: { y: 0.02 },
         },
         {
           id: "dress",
           title: "Дресс-код",
-          cue: "палитра и пожелания к образам",
-          cuePosition: "top",
-          buttonPosition: "top",
-          motion: "float",
-          box: { x: 65, y: 1085, width: 540, height: 500 },
-          zoom: 1,
-          maxScale: 0.62,
-          nudge: { y: 0.02 },
-        },
-        {
-          id: "wishes",
-          title: "Подарки и цветы",
-          cue: "пожелания справа",
+          cue: "QR, палитра и текст",
           cuePosition: "top",
           buttonPosition: "top",
           motion: "arc",
-          box: { x: 690, y: 1240, width: 365, height: 545 },
+          box: { x: 65, y: 1060, width: 545, height: 545 },
           zoom: 1,
-          maxScale: 0.78,
-          nudge: { y: 0.06 },
+          maxScale: 0.44,
+          nudge: { y: 0.02 },
+        },
+        {
+          id: "gifts",
+          title: "Подарки",
+          cue: "пожелания в конвертах",
+          cuePosition: "top",
+          buttonPosition: "top",
+          motion: "settle",
+          box: { x: 690, y: 1235, width: 360, height: 320 },
+          zoom: 1,
+          maxScale: 0.66,
+          nudge: { y: 0.04 },
+        },
+        {
+          id: "flowers",
+          title: "Цветы",
+          cue: "мини-бар вместо букетов",
+          cuePosition: "top",
+          buttonPosition: "top",
+          motion: "float",
+          box: { x: 770, y: 1540, width: 285, height: 250 },
+          zoom: 1,
+          maxScale: 0.72,
+          nudge: { y: 0.04 },
         },
         {
           id: "questionnaire",
-          title: "Анкета гостя",
-          cue: "главный нижний блок",
+          title: "Анкета и финал",
+          cue: "форма, P.S. и до встречи",
           cuePosition: "top",
           buttonPosition: "top",
           motion: "grand",
-          box: { x: 315, y: 1620, width: 445, height: 230 },
+          box: { x: 185, y: 1615, width: 850, height: 300 },
           zoom: 1,
-          maxScale: 0.68,
-          nudge: { y: 0.02 },
+          maxScale: 0.42,
+          nudge: { y: 0.06 },
         },
         {
           id: "overviewEnd",
@@ -276,9 +264,9 @@
           };
         }
 
-        const controlReserve = viewportWidth >= 900 ? 128 : viewportWidth >= 640 ? 104 : 86;
-        const safeWidth = viewportWidth - controlReserve - Math.min(52, viewportWidth * 0.1);
-        const safeHeight = viewportHeight - Math.min(72, viewportHeight * 0.1);
+        const controlReserve = viewportHeight >= 760 ? 104 : 88;
+        const safeWidth = viewportWidth - Math.min(52, viewportWidth * 0.1);
+        const safeHeight = viewportHeight - controlReserve - Math.min(72, viewportHeight * 0.1);
         const boxScale = Math.min(safeWidth / step.box.width, safeHeight / step.box.height) * step.zoom;
         const defaultMaxScale = viewportWidth >= 900 ? 1.5 : viewportWidth >= 640 ? 1.34 : 1.24;
         const maxScale = Math.min(defaultMaxScale, step.maxScale || defaultMaxScale);
@@ -291,14 +279,14 @@
         const minY = Math.min(0, viewportHeight - scaledHeight);
         const maxX = Math.max(0, viewportWidth - scaledWidth);
         const maxY = Math.max(0, viewportHeight - scaledHeight);
-        const safeCenterX = (viewportWidth - controlReserve) / 2;
+        const safeCenterY = (viewportHeight - controlReserve) / 2;
         const nudgeX = (step.nudge?.x || 0) * viewportWidth;
         const nudgeY = (step.nudge?.y || 0) * viewportHeight;
 
         return {
           scale,
-          x: clamp(safeCenterX - boxCenterX + nudgeX, minX, maxX),
-          y: clamp(viewportHeight / 2 - boxCenterY + nudgeY, minY, maxY),
+          x: clamp(viewportWidth / 2 - boxCenterX + nudgeX, minX, maxX),
+          y: clamp(safeCenterY - boxCenterY + nudgeY, minY, maxY),
         };
       };
 
