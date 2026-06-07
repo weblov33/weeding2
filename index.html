@@ -153,27 +153,15 @@
           nudge: { y: 0.02 },
         },
         {
-          id: "gifts",
-          title: "Подарки",
-          cue: "пожелания в конвертах",
+          id: "wishes",
+          title: "Пожелания",
+          cue: "подарки и цветы",
           cuePosition: "top",
           buttonPosition: "top",
           motion: "settle",
-          box: { x: 690, y: 1235, width: 360, height: 320 },
+          box: { x: 685, y: 1230, width: 370, height: 570 },
           zoom: 1,
-          maxScale: 0.66,
-          nudge: { y: 0.04 },
-        },
-        {
-          id: "flowers",
-          title: "Цветы",
-          cue: "мини-бар вместо букетов",
-          cuePosition: "top",
-          buttonPosition: "top",
-          motion: "float",
-          box: { x: 770, y: 1540, width: 285, height: 250 },
-          zoom: 1,
-          maxScale: 0.72,
+          maxScale: 0.52,
           nudge: { y: 0.04 },
         },
         {
@@ -186,7 +174,8 @@
           box: { x: 185, y: 1615, width: 850, height: 300 },
           zoom: 1,
           maxScale: 0.42,
-          nudge: { y: 0.06 },
+          nudge: { y: 0.04 },
+          bottomPad: 122,
         },
         {
           id: "overviewEnd",
@@ -276,7 +265,7 @@
         const boxCenterX = (step.box.x + step.box.width / 2) * scale;
         const boxCenterY = (step.box.y + step.box.height / 2) * scale;
         const minX = Math.min(0, viewportWidth - scaledWidth);
-        const minY = Math.min(0, viewportHeight - scaledHeight);
+        const minY = Math.min(0, viewportHeight - scaledHeight - (step.bottomPad || 0));
         const maxX = Math.max(0, viewportWidth - scaledWidth);
         const maxY = Math.max(0, viewportHeight - scaledHeight);
         const safeCenterY = (viewportHeight - controlReserve) / 2;
