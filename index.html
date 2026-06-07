@@ -44,6 +44,11 @@
               aria-label="Открыть анкету гостя"
             ></a>
           </div>
+          <div class="bottom-flourish" aria-hidden="true">
+            <span></span>
+            <i></i>
+            <span></span>
+          </div>
           <div class="scroll-hint" aria-hidden="true">
             <span>нажимайте “Дальше”</span>
             <i></i>
@@ -392,6 +397,7 @@
         journeyCue.dataset.position = step.cuePosition || "bottom";
         stepControl.dataset.position = step.buttonPosition || "bottom";
         stepControl.dataset.variant = step.motion || "route";
+        camera.dataset.step = step.id;
         journeyCue.querySelector("b").textContent = step.title;
         journeyCue.querySelector("span").textContent = step.cue;
 
