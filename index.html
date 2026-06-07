@@ -43,11 +43,11 @@
               rel="noreferrer"
               aria-label="Открыть анкету гостя"
             ></a>
-          </div>
-          <div class="bottom-flourish" aria-hidden="true">
-            <span></span>
-            <i></i>
-            <span></span>
+            <div class="bottom-flourish" aria-hidden="true">
+              <span></span>
+              <i></i>
+              <span></span>
+            </div>
           </div>
           <div class="scroll-hint" aria-hidden="true">
             <span>нажимайте “Дальше”</span>
@@ -171,16 +171,29 @@
         },
         {
           id: "questionnaire",
-          title: "Анкета и финал",
-          cue: "форма, P.S. и до встречи",
+          title: "Анкета гостя",
+          cue: "форма для подтверждения",
           cuePosition: "top",
           buttonPosition: "top",
           motion: "grand",
-          box: { x: 185, y: 1615, width: 850, height: 300 },
+          box: { x: 185, y: 1618, width: 700, height: 235 },
           zoom: 1,
-          maxScale: 0.42,
+          maxScale: 0.5,
           nudge: { y: 0.04 },
           bottomPad: 122,
+        },
+        {
+          id: "finalNote",
+          title: "До встречи",
+          cue: "финальная строка и P.S.",
+          cuePosition: "top",
+          buttonPosition: "top",
+          motion: "settle",
+          box: { x: 190, y: 1785, width: 850, height: 135 },
+          zoom: 1,
+          maxScale: 0.42,
+          nudge: { y: 0.08 },
+          bottomPad: 142,
         },
         {
           id: "overviewEnd",
