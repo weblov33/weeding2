@@ -133,33 +133,34 @@ body.story-is-gated {
 
 .bottom-flourish {
   position: absolute;
-  left: 300px;
-  top: 1936px;
-  z-index: 4;
+  left: 50%;
+  bottom: max(78px, calc(env(safe-area-inset-bottom) + 72px));
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 30px;
-  width: 480px;
-  height: 64px;
+  gap: 16px;
+  width: min(300px, calc(100vw - 80px));
+  height: 46px;
   color: #8b9a62;
-  opacity: 0.76;
+  opacity: 0.58;
   pointer-events: none;
+  transform: translateX(-50%);
 }
 
 .bottom-flourish::before,
 .bottom-flourish::after {
   content: "";
-  height: 3px;
+  height: 2px;
   flex: 1;
   border-radius: 999px;
-  background: linear-gradient(90deg, transparent, rgba(200, 117, 56, 0.42), transparent);
+  background: linear-gradient(90deg, transparent, rgba(200, 117, 56, 0.36), transparent);
 }
 
 .bottom-flourish span {
   position: relative;
-  width: 42px;
-  height: 42px;
+  width: 30px;
+  height: 30px;
   border: 2px solid rgba(139, 154, 98, 0.74);
   border-radius: 50% 50% 46% 54%;
   transform: rotate(-12deg);
@@ -174,17 +175,17 @@ body.story-is-gated {
 }
 
 .bottom-flourish span::before {
-  left: 17px;
-  top: -13px;
-  width: 6px;
-  height: 16px;
+  left: 12px;
+  top: -9px;
+  width: 4px;
+  height: 12px;
 }
 
 .bottom-flourish span::after {
-  left: -11px;
-  top: 17px;
-  width: 16px;
-  height: 6px;
+  left: -8px;
+  top: 12px;
+  width: 12px;
+  height: 4px;
 }
 
 .bottom-flourish span:last-child {
@@ -193,8 +194,8 @@ body.story-is-gated {
 
 .bottom-flourish i {
   position: relative;
-  width: 50px;
-  height: 36px;
+  width: 36px;
+  height: 26px;
 }
 
 .bottom-flourish i::before {
@@ -202,7 +203,7 @@ body.story-is-gated {
   position: absolute;
   inset: 0;
   color: #c87538;
-  font: 900 42px/1 "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+  font: 900 30px/1 "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
   text-align: center;
   transform: rotate(7deg);
 }
